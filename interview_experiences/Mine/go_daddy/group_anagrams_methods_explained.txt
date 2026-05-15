@@ -1,0 +1,130 @@
+
+GROUP ANAGRAMS – FROM BRUTE FORCE TO OPTIMIZED (PYTHON)
+
+Problem:
+Given a list of words, group words that are anagrams of each other.
+
+Example:
+Input:
+[cat, tac, act, debitcard, badcredit, temp]
+
+Output:
+[[cat, tac, act], [debitcard, badcredit], [temp]]
+
+--------------------------------------------------
+METHOD 1: BRUTE FORCE (PAIRWISE COMPARISON)
+--------------------------------------------------
+Idea:
+Compare each word with every other word.
+Two words are anagrams if their sorted characters are equal.
+
+Approach:
+- Maintain a visited array
+- For each word, compare it with all remaining words
+- Group matching anagrams together
+
+Time Complexity:
+- Sorting each comparison: O(k log k)
+- Pairwise comparisons: O(n^2)
+Total: O(n^2 * k log k)
+
+Space Complexity:
+- O(n) for visited array
+
+Verdict:
+- Too slow for large inputs
+- Only useful to explain baseline logic
+
+--------------------------------------------------
+METHOD 2: SORTED STRING AS KEY (HASH MAP)
+--------------------------------------------------
+Idea:
+Anagrams share the same sorted string.
+
+Approach:
+- Sort characters of each word
+- Use sorted word as dictionary key
+- Append original word to that key’s list
+
+Example:
+cat -> act
+tac -> act
+act -> act
+
+Time Complexity:
+- Sorting each word: O(k log k)
+- For n words: O(n * k log k)
+
+Space Complexity:
+- O(n * k) for keys and stored words
+
+Verdict:
+- Very common interview solution
+- Clean and easy to implement
+- Sorting cost can be high for long strings
+
+--------------------------------------------------
+METHOD 3: CHARACTER FREQUENCY COUNT (OPTIMAL)
+--------------------------------------------------
+Idea:
+Two anagrams have identical character frequencies.
+
+Approach:
+- Create a frequency array of size 26 for each word
+- Convert array to tuple (hashable)
+- Use tuple as dictionary key
+
+Time Complexity:
+- Counting characters per word: O(k)
+- For n words: O(n * k)
+
+Space Complexity:
+- O(n * k) for stored keys and output
+
+Verdict:
+- Most optimal solution
+- Avoids sorting
+- Best choice for large inputs
+
+--------------------------------------------------
+METHOD 4: COUNTER-BASED (PYTHONIC)
+--------------------------------------------------
+Idea:
+Use Counter to count characters, then use it as key.
+
+Approach:
+- Count characters using Counter
+- Convert to sorted tuple of items
+- Use as dictionary key
+
+Time Complexity:
+- Counting + sorting unique chars: O(k log k) worst-case
+- Overall: O(n * k log k)
+
+Space Complexity:
+- O(n * k)
+
+Verdict:
+- Very readable
+- Slightly slower than fixed-array method
+- Useful when alphabet size is unknown (Unicode)
+
+--------------------------------------------------
+COMPARISON SUMMARY
+--------------------------------------------------
+Method               Time Complexity        Interview Use
+--------------------------------------------------
+Brute Force          O(n^2 * k log k)       ❌ No
+Sorted Key           O(n * k log k)         ✅ Yes
+Frequency Count      O(n * k)               ⭐ Best
+Counter-based        O(n * k log k)         ✅ Yes
+
+--------------------------------------------------
+INTERVIEW TIP (MEMORIZE)
+--------------------------------------------------
+“I group anagrams by mapping each word to a canonical representation.
+Sorting gives a simple solution, but using a character frequency tuple
+reduces time complexity to O(n * k) and scales better.”
+
+--------------------------------------------------
+END OF FILE
