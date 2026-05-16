@@ -30,3 +30,26 @@ Q: How do you get the latest record per user in PySpark?
 Answer:
 
 Use row_number() over a window partitioned by user id and ordered by timestamp descending, then filter rn = 1.
+
+## Final Deduplicated Output
+
+```python
+latest_user_df.filter("rn = 1").drop("rn").show()
+```
+
+Output:
+
+```txt
+1 Harsha 2025-02-01
+2 Ravi   2025-01-15
+```
+
+## Key Takeaway
+
+This pattern is extremely common in production ETL:
+
+1. Partition by business key
+2. Order by timestamp descending
+3. Add row_number()
+4. Keep rn = 1
+5. Drop helper column
