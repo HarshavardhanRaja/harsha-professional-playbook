@@ -1,83 +1,175 @@
-# PySpark Zero to Hero Roadmap
+# 🚀 PySpark Zero → Hero (Harsha Professional Playbook)
 
-Goal: Become strong in PySpark from basics to advanced production-level concepts, with hands-on projects, interview preparation, and portfolio-ready implementations.
+Welcome.
 
-## Learning Phases
+This repository is my journey from:
 
-### Phase 1: Setup and Foundations
-- Install Python, Java, PySpark
-- Understand Big Data and distributed computing
-- Understand Spark vs Hadoop
-- Understand Spark architecture
+```txt
+PySpark Beginner
+        ↓
+Data Engineer
+        ↓
+Spark Optimizer
+        ↓
+Production Engineer
+        ↓
+Interview Expert
+        ↓
+Freelancer / Mentor
+```
 
-### Phase 2: PySpark Basics
+Goal:
+
+Build deep PySpark knowledge with:
+
+✅ Concepts  
+✅ Examples  
+✅ Real projects  
+✅ Interview preparation  
+✅ Spark internals  
+✅ Optimization  
+✅ Streaming  
+✅ Portfolio projects  
+
+---
+
+# 🗺 Learning Roadmap
+
+## Phase 0 — Environment Setup
+
+Learn:
+
+- Python
+- Java
+- Virtual environments
+- PySpark installation
+
+Outcome:
+
+Run first Spark session.
+
+Status:
+
+- [x] Python installed
+- [x] Java installed
+- [x] Virtual env created
+- [x] PySpark installed
+- [x] First SparkSession created
+- [x] First DataFrame created
+
+---
+
+## Phase 1 — Foundations
+
+Topics:
+
+- What is Big Data?
+- Why Spark exists?
+- Hadoop vs Spark
+- Distributed computing
+- Spark architecture
+
+Outcome:
+
+Explain:
+
+> Why do companies need Spark?
+
+---
+
+## Phase 2 — PySpark Basics
+
+Topics:
+
 - SparkSession
 - DataFrames
-- Schema
-- Select, filter, withColumn
-- Casting, aliases, derived columns
-- Actions vs transformations
+- Transformations
+- Actions
+- Filtering
+- select()
+- withColumn()
 
-### Phase 3: Core Data Engineering Operations
-- Joins
-- Aggregations
-- Window functions
-- Deduplication
-- Null handling
-- Date/time handling
-- Nested JSON handling
+---
 
-### Phase 4: Spark Internals
-- Driver and executors
-- Jobs, stages, tasks
-- DAG
-- Lazy evaluation
-- Narrow vs wide transformations
-- Shuffle
-- Partitioning
-- Catalyst optimizer
+## Example Learned
 
-### Phase 5: Optimization
-- Broadcast joins
-- Repartition vs coalesce
-- Cache vs persist
-- Skew handling
-- AQE
-- File size optimization
-- Spark UI debugging
+### DataFrame
 
-### Phase 6: File Formats and Lakehouse
-- CSV, JSON, Parquet
-- Partitioned writes
-- Delta Lake basics
-- Bronze, Silver, Gold layers
-- Incremental processing
+Think:
 
-### Phase 7: Streaming
-- Structured Streaming
-- Kafka integration
-- Checkpointing
-- Watermarking
-- Windowed aggregations
+```txt
+Excel Sheet
+    ≈ SQL Table
+    ≈ Pandas DataFrame
+    ≈ Spark DataFrame
+```
 
-### Phase 8: Production PySpark
-- Project structure
-- Logging
-- Config-driven jobs
-- Unit testing
-- Airflow orchestration
-- Docker setup
+Difference:
 
-### Phase 9: Portfolio Projects
-- Retail batch ETL pipeline
-- Crypto real-time analytics dashboard
-- Lakehouse pipeline with Bronze/Silver/Gold
-- Log analytics pipeline
-- Fraud detection streaming pipeline
+Spark DataFrame can run across many machines.
 
-### Phase 10: Interview Preparation
-- Topic-wise questions
-- Scenario-based questions
-- Coding questions
-- Optimization case studies
-- Mock interviews
+---
+
+### Lazy Evaluation
+
+Spark behaves like Swiggy:
+
+```txt
+select()
+filter()
+join()
+
+↓
+
+Added to cart
+
+↓
+
+show()
+
+↓
+
+Checkout → execute
+```
+
+Execution starts only when an action happens.
+
+---
+
+# 🎯 Interview Questions Covered
+
+### Q1
+
+What is SparkSession?
+
+Answer:
+
+SparkSession is the entry point used to interact with Spark functionality including DataFrames and SQL operations.
+
+---
+
+### Q2
+
+What is Lazy Evaluation?
+
+Answer:
+
+Spark postpones execution until an action occurs, allowing optimization before processing.
+
+---
+
+# 📂 Folder Structure
+
+(keep repo structure here)
+
+---
+
+# Progress
+
+Current Stage:
+
+Environment Setup → Completed ✅
+
+Next:
+
+Transformations → Lazy Evaluation → Execution Plans

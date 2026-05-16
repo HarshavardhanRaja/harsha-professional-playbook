@@ -1,22 +1,12 @@
-# PySpark Progress Tracker
+# PySpark Zero → Hero Progress Tracker
 
-| Area | Status | Notes | Last Updated |
-| --- | --- | --- | --- |
-| Foundations | Not started |  |  |
-| PySpark Basics | Not started |  |  |
-| Spark Internals | Not started |  |  |
-| Optimization | Not started |  |  |
-| Streaming | Not started |  |  |
-| Projects | Not started |  |  |
-| Interview Questions | Not started |  |  |
-| Mock Interviews | Not started |  |  |
-| System Design | Not started |  |  |
-| Cheatsheets | Not started |  |  |
+Environment Setup
 
-## Weekly Notes
+[✓] Java installed
+[✓] Python 3.11 installed
+[✓] Virtual environment created
+[ ] PySpark installed
+[ ] First Spark session created
+[ ] First DataFrame created
 
-- Week:
-- Focus:
-- Wins:
-- Gaps:
-- Next actions:
+Progress: 10%
