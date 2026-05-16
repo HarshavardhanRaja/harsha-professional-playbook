@@ -87,3 +87,37 @@ Each project has isolated dependencies.
 Think:
 
 venv ≈ Docker container for Python packages
+
+
+## Python Session Memory
+
+Observation:
+
+Closing Python removes variables.
+
+Example:
+
+```python
+spark
+df
+explicit_df
+```
+
+will disappear after exiting REPL.
+
+Error:
+
+```txt
+NameError:
+name 'spark' is not defined
+```
+
+Reason:
+
+Variable exists only within current Python session.
+
+Analogy:
+
+Python REPL ≈ temporary whiteboard
+
+Close room → whiteboard erased
