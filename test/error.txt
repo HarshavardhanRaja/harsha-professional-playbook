@@ -1,0 +1,4 @@
+BQ_PROCEDURE_ERROR_001: 
+ODL table record count does not match with the count passed- 
+Query error: Value of type STRING cannot be assigned to cstone_last_updatetm, 
+which has type DATETIME at [axp-lumid.code.fds_table_create_sp:1:175] at [axp-lumid.code.fds_table_create_sp:62:33

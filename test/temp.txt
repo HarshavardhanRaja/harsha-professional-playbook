@@ -1,0 +1,67 @@
+
+
+begin
+/*
+Declaring the intermediate variables
+*/
+DECLARE missing_meta_columns ARRAY<STRUCT<col STRING, type STRING>>;
+declare misgging_column_sql string default "";
+declare modified_sql string;
+DECLARE fds_table_name STRING;
+DECLARE cs_col_count INT64;
+SET fds_table_name = ARRAY_REVERSE(SPLIT(fds_table, '.'))[OFFSET(0)];
+
+	begin
+
+		EXECUTE IMMEDIATE ("DROP TABLE IF EXISTS `"||fds_table||"`");
+
+    set modified_sql = replace(fds_query, '("""', "('");
+		set modified_sql = replace(modified_sql, '""")', "')");
+
+    select modified_sql;
+
+		if fds_query is not null then
+			EXECUTE IMMEDIATE ("create table `"||fds_table||"` as "||modified_sql||"");
+
+			execute immediate "WITH t1 AS (	SELECT column_name, data_type FROM "||landing_dataset||".INFORMATION_SCHEMA.COLUMNS where column_name like 'lumi_%' and table_name='"||temp_fds_table_name||"'),t2 AS (SELECT column_name, data_type FROM "||landing_dataset||".INFORMATION_SCHEMA.COLUMNS where column_name like 'lumi_%' and table_name='"||fds_table_name||"') SELECT ARRAY_AGG(STRUCT(t1.column_name, t1.data_type)) FROM t1 LEFT JOIN t2 USING (column_name) WHERE t2.column_name IS NULL" into missing_meta_columns;
+
+			select missing_meta_columns;
+			FOR item IN (SELECT col, type FROM UNNEST(missing_meta_columns)) DO
+				if misgging_column_sql="" then
+					SET misgging_column_sql = misgging_column_sql || " add column " || item.col ||" "||item.type  ;
+				else
+					SET misgging_column_sql = misgging_column_sql || ", add column " || item.col ||" "||item.type ;
+				end if;
+			END FOR;
+
+			if misgging_column_sql is not null and length(trim(misgging_column_sql))>0 and trim(misgging_column_sql)!=',' then
+				set misgging_column_sql = "alter table `"||fds_table ||"` "|| misgging_column_sql;
+				select misgging_column_sql;
+				execute immediate misgging_column_sql;
+			end if;
+
+			IF cstone_feed_key is not null then
+					EXECUTE IMMEDIATE ("SELECT COUNT(*) FROM "||landing_dataset||".INFORMATION_SCHEMA.COLUMNS WHERE column_name IN ('cstone_feed_key', 'cstone_last_updatetm') AND table_name='"||fds_table_name||"'") INTO cs_col_count;
+
+					IF cs_col_count = 0 THEN
+						EXECUTE IMMEDIATE ("ALTER TABLE `"||landing_dataset||"."||fds_table_name||"` ADD COLUMN cstone_feed_key INTEGER, ADD COLUMN cstone_last_updatetm DATETIME");
+					END IF;
+
+					EXECUTE IMMEDIATE ("UPDATE `"||landing_dataset||"."||fds_table_name||"` SET cstone_feed_key = "||cstone_feed_key||" WHERE 1=1");
+
+					IF data_location IN ("US", "us-east4") THEN
+						EXECUTE IMMEDIATE ("UPDATE `"||landing_dataset||"."||fds_table_name||"` SET cstone_last_updatetm = (SELECT DATETIME(TIMESTAMP(lumi_ingestion_time), 'America/Phoenix') FROM `"||landing_dataset||"."||pre_stage_table_name||"` LIMIT 1) WHERE 1=1");
+					ELSE
+						EXECUTE IMMEDIATE ("UPDATE `"||landing_dataset||"."||fds_table_name||"` SET cstone_last_updatetm = (SELECT lumi_ingestion_time FROM `"||landing_dataset||"."||pre_stage_table_name||"` LIMIT 1) WHERE 1=1");
+					END IF;
+				END IF;
+
+		end if;
+
+		execute immediate("Drop table `"||landing_dataset||"."||temp_fds_table_name||"`");
+
+		EXCEPTION WHEN ERROR THEN
+				RAISE using message = (select error_code_prefix||error_code||': '||error_msg||'- '|| @@error.message from `code.sp_error_codes` where error_id = 1);
+		end;		
+end
+

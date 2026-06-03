@@ -1,0 +1,162 @@
+{
+  "table_name": "gdm_ps_cust_fraud_referral_clone",
+  "created_ts": "2026-05-13T08:02:17.340+00:00",
+  "status": "FAILED",
+  "load_type": "LOAD_APPEND",
+  "job_type": "Microbatch",
+  "is_re_ingestion": false,
+  "is_batched": false,
+  "ingestion_payload": "{\"request\":{\"execution_id\":\"\",\"system\":\"axp-lumid\",\"date_time\":\"2026-05-13T07:40:11Z\",\"correlation-id\":\"\",\"pipeline_id\":\"8cd0e147-a032-4aee-b8b4-699426f5f4a4\",\"source_feed_name\":\"gdm_ps_cust_fraud_referral_pipeline_src1_gdm_cornerstone_tech_clone_gdm_ps_cust_fraud_referral_clone_USA\",\"details\":{\"control-file\":{\"path\":\"\",\"file\":\"\"},\"data-file\":{\"path\":\"\",\"file\":[\"\"],\"schema_def\":{\"dataset_id\":\"04ef802e-8509-479b-8824-2a7c19648b87\"}}},\"id\":\"\",\"type\":\"Microbatch\",\"pipeline_name\":\"gdm_ps_cust_fraud_referral_pipeline\"},\"observability\":{\"traceId\":\"\",\"traceName\":\"MB-Trigger-8cd0e147-a032-4aee-b8b4-699426f5f4a4\"}}",
+  "execution_id": "f353d3bf-786c-440c-8962-449b0d82a8a6",
+  "dag_details": [
+    {
+      "dag_id": "lumi-sor-load",
+      "execution_id": "f353d3bf-786c-440c-8962-449b0d82a8a6",
+      "status": "FAILED",
+      "execution_type": "NEW",
+      "execution_count": 1,
+      "dag_run_id": "manual__2026-05-13T08:20:14.878016+00:00",
+      "event_details": [
+        {
+          "id": 1.4237188490222633e+18,
+          "lumiIngestionJobExeId": 2.5913213077610824e+18,
+          "jobType": "Microbatch",
+          "event": "stage_to_main_copy_task",
+          "payload": "Updated by Event --\u003E fds_task",
+          "status": "UPSTREAM_FAILED",
+          "executionType": "Original",
+          "createdTs": "2026-05-13T08:11:58.714+00:00",
+          "updateTs": "2026-05-13T08:22:14.958+00:00",
+          "executionId": "f353d3bf-786c-440c-8962-449b0d82a8a6"
+        },
+        {
+          "id": 3.153101105932534e+18,
+          "lumiIngestionJobExeId": 2.5913213077610824e+18,
+          "jobType": "Microbatch",
+          "event": "trigger_dq_preventive_dag_cyclic",
+          "payload": "Updated by Event --\u003E fds_task",
+          "status": "UPSTREAM_FAILED",
+          "executionType": "Original",
+          "createdTs": "2026-05-13T08:11:58.738+00:00",
+          "updateTs": "2026-05-13T08:22:14.958+00:00",
+          "executionId": "f353d3bf-786c-440c-8962-449b0d82a8a6"
+        },
+        {
+          "id": 4.4501377986152366e+18,
+          "lumiIngestionJobExeId": 2.5913213077610824e+18,
+          "jobType": "Microbatch",
+          "event": "init_task",
+          "payload": "{\"status\": \"SUCCESSFUL\", \"event\": \"init_task\", \"timestamp\": \"2026-05-13 08:20:26.645859\", \"dag_id\": \"lumi-sor-load\", \"dag_run_id\": \"manual__2026-05-13T08:20:14.878016+00:00\", \"execution_id\": \"f353d3bf-786c-440c-8962-449b0d82a8a6\", \"error_code\": \"\", \"error_msg\": \"None\", \"results\": {\"control_info\": {\"original_control_data\": null}, \"operator_results\": [{\"operator_id\": \"init_task\"}]}}",
+          "status": "SUCCESS",
+          "executionType": "Original",
+          "createdTs": "2026-05-13T08:11:58.630+00:00",
+          "updateTs": "2026-05-13T08:20:26.902+00:00",
+          "errorMessage": "None",
+          "executionId": "f353d3bf-786c-440c-8962-449b0d82a8a6",
+          "startTs": "2026-05-13T08:20:22.974+00:00",
+          "endTs": "2026-05-13T08:20:26.902+00:00"
+        },
+        {
+          "id": 4.882483362842804e+18,
+          "lumiIngestionJobExeId": 2.5913213077610824e+18,
+          "jobType": "Microbatch",
+          "event": "onCop_PII_task",
+          "payload": "Updated by Event --\u003E fds_task",
+          "status": "UPSTREAM_FAILED",
+          "executionType": "Original",
+          "createdTs": "2026-05-13T08:11:58.692+00:00",
+          "updateTs": "2026-05-13T08:22:14.958+00:00",
+          "executionId": "f353d3bf-786c-440c-8962-449b0d82a8a6"
+        },
+        {
+          "id": 7.908902312435778e+18,
+          "lumiIngestionJobExeId": 2.5913213077610824e+18,
+          "jobType": "Microbatch",
+          "event": "fds_task",
+          "payload": "{\"status\": \"FAILED\", \"event\": \"fds_task\", \"timestamp\": \"2026-05-13 08:22:14.432011\", \"dag_id\": \"lumi-sor-load\", \"dag_run_id\": \"manual__2026-05-13T08:20:14.878016+00:00\", \"execution_id\": \"f353d3bf-786c-440c-8962-449b0d82a8a6\", \"error_code\": \"DI_ERROR_606\", \"error_msg\": \"400 GET https://bigquery.googleapis.com/bigquery/v2/projects/axp-lumid/queries/lumisorload_eeab3ed4178d8d5d799c31173aa02c73?maxResults=0&location=US&prettyPrint=false: BQ_PROCEDURE_ERROR_001: ODL table record count does not match with the count passed- Query error: Value of type STRING cannot be assigned to cstone_last_updatetm, which has type DATETIME at [axp-lumid.code.fds_table_create_sp:1:175] at [axp-lumid.code.fds_table_create_sp:62:33]\\n\\nLocation: US\\nJob ID: lumisorload_eeab3ed4178d8d5d799c31173aa02c73\\n\", \"results\": {\"control_info\": {\"original_control_data\": null}, \"operator_results\": [{\"operator_id\": \"fds_task\"}], \"bnc_details\": null}}",
+          "status": "FAILED",
+          "executionType": "Original",
+          "createdTs": "2026-05-13T08:11:58.581+00:00",
+          "updateTs": "2026-05-13T08:22:14.958+00:00",
+          "errorMessage": "400 GET https://bigquery.googleapis.com/bigquery/v2/projects/axp-lumid/queries/lumisorload_eeab3ed4178d8d5d799c31173aa02c73?maxResults=0&location=US&prettyPrint=false: BQ_PROCEDURE_ERROR_001: ODL table record count does not match with the count passed- Query error: Value of type STRING cannot be assigned to cstone_last_updatetm, which has type DATETIME at [axp-lumid.code.fds_table_create_sp:1:175] at [axp-lumid.code.fds_table_create_sp:62:33]\n\nLocation: US\nJob ID: lumisorload_eeab3ed4178d8d5d799c31173aa02c73\n",
+          "executionId": "f353d3bf-786c-440c-8962-449b0d82a8a6",
+          "startTs": "2026-05-13T08:21:48.273+00:00",
+          "endTs": "2026-05-13T08:22:14.958+00:00"
+        },
+        {
+          "id": 8.341247876663345e+18,
+          "lumiIngestionJobExeId": 2.5913213077610824e+18,
+          "jobType": "Microbatch",
+          "event": "storage_validator_task",
+          "payload": "Updated by Event --\u003E fds_task",
+          "status": "UPSTREAM_FAILED",
+          "executionType": "Original",
+          "createdTs": "2026-05-13T08:11:58.727+00:00",
+          "updateTs": "2026-05-13T08:22:14.958+00:00",
+          "executionId": "f353d3bf-786c-440c-8962-449b0d82a8a6"
+        }
+      ],
+      "dag_url": "https://b1c29b90b16f4ec782502f77694a00bf-dot-us-central1.composer.googleusercontent.com/api/v1/dags/",
+      "table_name": "gdm_ps_cust_fraud_referral_clone"
+    },
+    {
+      "dag_id": "lumi-sor-ingest",
+      "execution_id": "f353d3bf-786c-440c-8962-449b0d82a8a6",
+      "status": "COMPLETED",
+      "execution_type": "NEW",
+      "execution_count": 1,
+      "dag_run_id": "manual__2026-05-13T08:12:07.883112+00:00",
+      "child_dags": "lumi-sor-load",
+      "event_details": [
+        {
+          "id": 1.639891631136047e+18,
+          "lumiIngestionJobExeId": 5.617740257354056e+18,
+          "jobType": "Microbatch",
+          "event": "ngbd_di_pipeline_beam_task",
+          "payload": "{\"status\":\"SUCCESS\",\"event\":\"ngbd_di_pipeline_beam_task\",\"timestamp\":\"2026-05-13T08:20:07.902+0000\",\"dag_id\":\"lumi-sor-ingest\",\"dag_run_id\":\"manual__2026-05-13T08:12:07.883112+00:00\",\"execution_id\":\"f353d3bf-786c-440c-8962-449b0d82a8a6\",\"skip_downstream_task\":false,\"results\":{\"operator_results\":[{\"control_data\":{\"parser_type\":\"PROPERTY\"},\"name\":\"ControlFileReader_ff96ec39-1239-49fc-8eb7-3f8ad26e7db4\",\"id\":\"ff96ec39-1239-49fc-8eb7-3f8ad26e7db4\"},{\"table_spec\":\"axp-lumid.landing.gdm_cornerstone_tech_clone_b29aac65-b1f0-48d2-a7b1-283d5d597921_f353d3bf-786c-440c-8962-449b0d82a8a6_1778659994\",\"table_name\":\"gdm_cornerstone_tech_clone_b29aac65-b1f0-48d2-a7b1-283d5d597921_f353d3bf-786c-440c-8962-449b0d82a8a6_1778659994\",\"dataset_id\":\"d479fc61-0366-4886-b3ac-73d5a6293348\",\"feed_name\":\"gdm_cornerstone_tech_clone\",\"source_dataset_id\":\"b29aac65-b1f0-48d2-a7b1-283d5d597921\",\"status\":\"SKIPPED\",\"name\":\"BigQueryDataWrite_6466d6f4-8d62-40c7-af8d-a02020db70be\",\"id\":\"6466d6f4-8d62-40c7-af8d-a02020db70be\"},{\"parsed_control_data\":\"gs://axp-lumid-staging/batch_ingestion/staging/f353d3bf-786c-440c-8962-449b0d82a8a6/2026-05-13-08-13-14/control/PDS_b29aac65-b1f0-48d2-a7b1-283d5d597921\",\"control_data_location\":\"gs://axp-lumid-staging/batch_ingestion/staging/f353d3bf-786c-440c-8962-449b0d82a8a6/2026-05-13-08-13-14/control/PDS\",\"error_summary_location\":\"gs://axp-lumid-staging/batch_ingestion/staging/f353d3bf-786c-440c-8962-449b0d82a8a6/2026-05-13-08-13-14/error_summary/PDS\",\"error_data_location\":\"gs://axp-lumid-staging/batch_ingestion/staging/f353d3bf-786c-440c-8962-449b0d82a8a6/2026-05-13-08-13-14/error_summary/PDS\",\"name\":\"PlatformDataStdOperator_401fbb14-1714-49f6-80c5-38150fc2ac9b\",\"id\":\"401fbb14-1714-49f6-80c5-38150fc2ac9b\"},{\"is_parser_output\":true,\"control_data_location\":\"gs://axp-lumid-staging/batch_ingestion/staging/f353d3bf-786c-440c-8962-449b0d82a8a6/2026-05-13-08-13-14/control/PARSER\",\"error_summary_location\":\"gs://axp-lumid-staging/batch_ingestion/staging/f353d3bf-786c-440c-8962-449b0d82a8a6/2026-05-13-08-13-14/error_summary/PARSER\",\"error_data_location\":\"gs://axp-lumid-staging/batch_ingestion/staging/f353d3bf-786c-440c-8962-449b0d82a8a6/2026-05-13-08-13-14/error_summary/PARSER\",\"name\":\"FileReader_89a44324-31da-4eb8-8dd8-507254540899\",\"id\":\"89a44324-31da-4eb8-8dd8-507254540899\"}],\"control_info\":{\"PARSER\":{\"DEFAULT_FEED_ID.INPUT_RECORD_COUNT_DEFAULT_PARENT_TAG\":\"1\",\"DEFAULT_FEED_ID.good_record_count\":\"1\",\"b29aac65-b1f0-48d2-a7b1-283d5d597921.GOOD_RECORDS\":\"1\",\"DEFAULT_FEED_ID.parser_type\":\"PROPERTY\"},\"PDS_b29aac65-b1f0-48d2-a7b1-283d5d597921\":{\"b29aac65-b1f0-48d2-a7b1-283d5d597921.parent_good_record_count\":\"1\",\"b29aac65-b1f0-48d2-a7b1-283d5d597921.good_record_count\":\"1\"},\"original_control_data\":{\"data_file_name\":\"gs://axp-lumid-landing-zone/microbatch_data/stage/8cd0e147-a032-4aee-b8b4-699426f5f4a4/af75c610-07cc-4ac1-bad1-93b7fd7e9d20/f353d3bf-786c-440c-8962-449b0d82a8a6/batch*\",\"source_extract_datetime\":\"2026-05-13T08:12:00\",\"effective_control_file_name\":\"gs://axp-lumid-landing-zone/microbatch_data/stage/8cd0e147-a032-4aee-b8b4-699426f5f4a4/af75c610-07cc-4ac1-bad1-93b7fd7e9d20/f353d3bf-786c-440c-8962-449b0d82a8a6/control.properties\",\"control_file_name\":\"gs://axp-lumid-landing-zone/microbatch_data/landing/8cd0e147-a032-4aee-b8b4-699426f5f4a4/af75c610-07cc-4ac1-bad1-93b7fd7e9d20/control:control-323-2026_05_13_08_12_00\",\"source_extract_datetime_consolidated\":\"2026-05-13T08:12:00\",\"oringinal_data_file_name\":\"gs://axp-lumid-landing-zone/microbatch_data/landing/8cd0e147-a032-4aee-b8b4-699426f5f4a4/af75c610-07cc-4ac1-bad1-93b7fd7e9d20/data:batch-323-2026_05_13_08_12_00\",\"bnc_record_count\":\"1\"},\"BQWrite_b29aac65-b1f0-48d2-a7b1-283d5d597921\":{\"table_spec\":\"axp-lumid.landing.gdm_cornerstone_tech_clone_b29aac65-b1f0-48d2-a7b1-283d5d597921_f353d3bf-786c-440c-8962-449b0d82a8a6_1778659994\"}},\"source_ingestion_datetime\":\"2026-05-13T08:12:00\",\"dataflow_job_id\":\"2026-05-13_01_14_07-352277193599713864\",\"error_record_location\":\"gs://axp-lumid-staging/batch_ingestion/failed_data\",\"staging_location\":\"gs://axp-lumid-staging/batch_ingestion/staging\",\"start_ts\":\"2026-05-13T08:13:14.751+0000\",\"end_ts\":\"2026-05-13T08:13:14.751+0000\",\"file_id\":\"src1\",\"file_version_id\":\"null\",\"sequence_number\":\"-1\",\"is_sequence_check_enabled\":\"false\",\"zero_record_flag\":false,\"version\":\"2.0\"}}",
+          "status": "SUCCESS",
+          "executionType": "Original",
+          "createdTs": "2026-05-13T08:11:57.876+00:00",
+          "updateTs": "2026-05-13T08:20:08.751+00:00",
+          "errorMessage": "",
+          "executionId": "f353d3bf-786c-440c-8962-449b0d82a8a6",
+          "startTs": "2026-05-13T08:12:58.849+00:00",
+          "endTs": "2026-05-13T08:20:08.751+00:00"
+        },
+        {
+          "id": 4.233965016501453e+18,
+          "lumiIngestionJobExeId": 5.617740257354056e+18,
+          "jobType": "Microbatch",
+          "event": "dmu_response_task",
+          "payload": "{\"status\": \"SUCCESSFUL\", \"event\": \"dmu_response_task\", \"timestamp\": \"2026-05-13 08:12:40.087049\", \"dag_id\": \"lumi-sor-ingest\", \"dag_run_id\": \"manual__2026-05-13T08:12:07.883112+00:00\", \"execution_id\": \"f353d3bf-786c-440c-8962-449b0d82a8a6\", \"error_msg\": \"\", \"error_code\": \"\", \"results\": {\"operator_results\": [{\"output_location\": \"\", \"control_file_output_location\": \"\", \"record_count\": null, \"operator_id\": \"dmu_response_task\"}]}}",
+          "status": "SUCCESS",
+          "executionType": "Original",
+          "createdTs": "2026-05-13T08:11:57.861+00:00",
+          "updateTs": "2026-05-13T08:12:40.110+00:00",
+          "errorMessage": "",
+          "executionId": "f353d3bf-786c-440c-8962-449b0d82a8a6",
+          "startTs": "2026-05-13T08:12:38.638+00:00",
+          "endTs": "2026-05-13T08:12:40.110+00:00"
+        },
+        {
+          "id": 5.098656144956588e+18,
+          "lumiIngestionJobExeId": 5.617740257354056e+18,
+          "jobType": "Microbatch",
+          "event": "init_task",
+          "payload": "{\"status\": \"SUCCESSFUL\", \"event\": \"init_task\", \"timestamp\": \"2026-05-13 08:12:15.598720\", \"dag_id\": \"lumi-sor-ingest\", \"dag_run_id\": \"manual__2026-05-13T08:12:07.883112+00:00\", \"execution_id\": \"f353d3bf-786c-440c-8962-449b0d82a8a6\", \"error_code\": \"\", \"error_msg\": \"None\", \"results\": {\"control_info\": {\"original_control_data\": null}, \"operator_results\": [{\"operator_id\": \"init_task\"}]}}",
+          "status": "SUCCESS",
+          "executionType": "Original",
+          "createdTs": "2026-05-13T08:11:57.868+00:00",
+          "updateTs": "2026-05-13T08:12:15.774+00:00",
+          "errorMessage": "None",
+          "executionId": "f353d3bf-786c-440c-8962-449b0d82a8a6",
+          "startTs": "2026-05-13T08:12:12.733+00:00",
+          "endTs": "2026-05-13T08:12:15.774+00:00"
+        }
+      ],
+      "dag_url": "https://b1c29b90b16f4ec782502f77694a00bf-dot-us-central1.composer.googleusercontent.com/api/v1/dags/",
+      "table_name": "gdm_ps_cust_fraud_referral_clone"
+    }
+  ],
+  "seq_nbr": 0
+}
