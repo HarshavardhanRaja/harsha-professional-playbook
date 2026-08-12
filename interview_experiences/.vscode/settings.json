@@ -9,5 +9,6 @@
     "editor.inlineSuggest.enabled": false,
     "github.copilot.enable": {
         "*": false
-    }
+    },
+    "cursor.cpp.enable": false
 }
