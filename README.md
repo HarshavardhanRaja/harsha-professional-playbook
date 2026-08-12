@@ -24,36 +24,31 @@ harsha-professional-playbook/
 │
 ├── README.md                        ← You are here
 │
+├── de_playbook/                     ← 📚 Complete DE knowledge base
+│   ├── README.md                    ← Module index + study schedule
+│   ├── MASTER_TRACKER.md            ← Daily progress log
+│   ├── 01_SQL/                      ← SQL mastery (7 topics)
+│   ├── 02_Python/                   ← Python for DE (8 topics)
+│   ├── 03_PySpark/                  ← PySpark & optimization (6 topics)
+│   ├── 04_Data_Warehousing/         ← DWH concepts & patterns (5 topics)
+│   ├── 05_dbt/                      ← dbt fundamentals to project (5 topics)
+│   ├── 06_Databricks/               ← Delta Lake & Lakehouse (5 topics)
+│   ├── 07_Kafka_Streaming/          ← Streaming & real-time (4 topics)
+│   └── 08_Interview_Prep/           ← Cheatsheets + behavioral stories
+│
 ├── job_hunt/                        ← 🎯 Job search command center
 │   ├── freelance/
 │   │   └── README.md                ← 32 freelance platforms tracker
 │   ├── full_time/
 │   │   ├── india.md                 ← 21 India job boards
-│   │   ├── remote.md               ← 30 remote job boards (India & intl)
-│   │   └── international.md        ← 49 intl boards (Gulf, EU, US, APAC)
+│   │   ├── remote.md                ← 30 remote job boards (India & intl)
+│   │   └── international.md         ← 49 intl boards (Gulf, EU, US, APAC)
 │   └── Resume/                      ← Career documents
 │       ├── full_time/               ← Full-time role resumes
 │       ├── freelance/               ← Freelance / consulting resumes
 │       └── reference_resumes/       ← Source-of-truth resumes (MD + PDF)
 │
-├── data_engineering_roadmap/        ← Complete DE knowledge base & interview prep
-│   ├── 01_SQL/
-│   ├── 02_Python/
-│   ├── 03_Pyspark/
-│   ├── 04_Datawarehousing/
-│   ├── behavioral/
-│   ├── cloud/
-│   ├── data_engineering/
-│   ├── distributed_systems/
-│   ├── lakehouse/
-│   ├── mock_interviews/
-│   ├── performance_tuning/
-│   ├── projects/
-│   ├── streaming/
-│   ├── system_design/
-│   └── README.md                    ← Detailed roadmap & learning phases
-│
-└── interview_experiences/           ← Real coding problems & notes from interviews
+└── interview_experiences/           ← 🎤 Real problems from real interviews
     └── Mine/
         ├── zluri/                   ← Zluri (2 rounds)
         ├── go_daddy/                ← GoDaddy
@@ -66,11 +61,45 @@ harsha-professional-playbook/
 
 ---
 
+## 📚 DE Playbook
+
+The [`de_playbook/`](./de_playbook/) folder is the core of this repo — a structured, session-by-session knowledge base built while actively preparing for Senior Data Engineer roles.
+
+### 🗓️ 8-Week Study Plan
+
+| Week | Module | Goal |
+|---|---|---|
+| Week 1 | **SQL** | Solve any SQL interview question cold |
+| Week 2 | **Python** | Write production-grade DE code |
+| Week 3 | **PySpark** | Optimize Spark jobs, ace PySpark rounds |
+| Week 4 | **Data Warehousing + dbt** | Design warehouses, build dbt models |
+| Week 5 | **Databricks** | Build medallion pipelines, explain Delta Lake |
+| Week 6 | **Kafka + Streaming** | Explain guarantees, build a real pipeline |
+| Week 7–8 | **Mock Interviews** | Full loop simulations, offers |
+
+### 📄 How Every Topic Is Structured
+
+```text
+topic_name/
+├── notes.md         ← theory + cheatsheet (written while learning)
+├── practice.sql/.py ← runnable exercises with solutions
+└── interview.md     ← Q&A with model answers + follow-ups
+```
+
+### 🧱 Non-Negotiables for Senior DE Roles
+
+- **SQL:** Window Functions, CTEs, Analytical Patterns, Execution Order
+- **Python:** OOP, Generators, Decorators, Multithreading
+- **PySpark:** Shuffles, Partitioning, Broadcast Joins, Optimization
+- **Data Warehouse:** CDC, SCD Type 2, Incremental Loads, Fact vs Dimension
+- **Streaming:** Kafka, Watermarks, Exactly-once vs At-least-once
+- **Modern Stack:** dbt, Databricks, Delta Lake, Medallion Architecture
+
+---
+
 ## 💼 Job Hunt Hub
 
-The [`job_hunt/`](./job_hunt/) folder is the **command center** for all job search activity — freelance platforms, full-time job boards, and resumes, all in one place.
-
-### 📂 Structure
+The [`job_hunt/`](./job_hunt/) folder is the command center for all job search activity — freelance platforms, full-time job boards, and resumes, all in one place.
 
 | File | What's Inside | # of Sites |
 |---|---|---|
@@ -80,12 +109,6 @@ The [`job_hunt/`](./job_hunt/) folder is the **command center** for all job sear
 | [`full_time/international.md`](./job_hunt/full_time/international.md) | Gulf, Europe, US, APAC boards + relocation platforms | 49 |
 | [`Resume/`](./job_hunt/Resume/) | All resume versions (full-time, freelance, reference) | — |
 
-### 🔄 Daily Workflow
-
-1. Open the relevant tracker file (freelance / india / remote / international)
-2. Click your saved dashboard links
-3. Check for new opportunities
-4. Apply and update the status column
 
 > Each file has editable columns for `My Profile/Dashboard` links and `Status` tracking so you can manage everything from these files.
 
