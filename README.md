@@ -24,6 +24,18 @@ harsha-professional-playbook/
 │
 ├── README.md                        ← You are here
 │
+├── job_hunt/                        ← 🎯 Job search command center
+│   ├── freelance/
+│   │   └── README.md                ← 32 freelance platforms tracker
+│   ├── full_time/
+│   │   ├── india.md                 ← 21 India job boards
+│   │   ├── remote.md               ← 30 remote job boards (India & intl)
+│   │   └── international.md        ← 49 intl boards (Gulf, EU, US, APAC)
+│   └── Resume/                      ← Career documents
+│       ├── full_time/               ← Full-time role resumes
+│       ├── freelance/               ← Freelance / consulting resumes
+│       └── reference_resumes/       ← Source-of-truth resumes (MD + PDF)
+│
 ├── data_engineering_roadmap/        ← Complete DE knowledge base & interview prep
 │   ├── 01_SQL/
 │   ├── 02_Python/
@@ -41,21 +53,41 @@ harsha-professional-playbook/
 │   ├── system_design/
 │   └── README.md                    ← Detailed roadmap & learning phases
 │
-├── interview_experiences/           ← Real coding problems & notes from interviews
-│   └── Mine/
-│       ├── zluri/                   ← Zluri (2 rounds)
-│       ├── go_daddy/                ← GoDaddy
-│       ├── globant/
-│       ├── hilabs/
-│       ├── purplesquare_ai/
-│       ├── global_logic/
-│       └── hacker_rank/
-│
-└── Resume/                          ← Career documents
-    ├── full_time/                   ← Full-time role resumes
-    ├── freelance/                   ← Freelance / consulting resumes
-    └── reference_resumes/           ← Source-of-truth resumes (Markdown + PDF)
+└── interview_experiences/           ← Real coding problems & notes from interviews
+    └── Mine/
+        ├── zluri/                   ← Zluri (2 rounds)
+        ├── go_daddy/                ← GoDaddy
+        ├── globant/
+        ├── hilabs/
+        ├── purplesquare_ai/
+        ├── global_logic/
+        └── hacker_rank/
 ```
+
+---
+
+## 💼 Job Hunt Hub
+
+The [`job_hunt/`](./job_hunt/) folder is the **command center** for all job search activity — freelance platforms, full-time job boards, and resumes, all in one place.
+
+### 📂 Structure
+
+| File | What's Inside | # of Sites |
+|---|---|---|
+| [`freelance/README.md`](./job_hunt/freelance/README.md) | All freelance platforms for DE consulting work | 32 |
+| [`full_time/india.md`](./job_hunt/full_time/india.md) | India-specific job boards (Naukri, Instahyre, Cutshort, etc.) | 21 |
+| [`full_time/remote.md`](./job_hunt/full_time/remote.md) | Remote jobs — India & International (YC, Remotive, Arc, etc.) | 30 |
+| [`full_time/international.md`](./job_hunt/full_time/international.md) | Gulf, Europe, US, APAC boards + relocation platforms | 49 |
+| [`Resume/`](./job_hunt/Resume/) | All resume versions (full-time, freelance, reference) | — |
+
+### 🔄 Daily Workflow
+
+1. Open the relevant tracker file (freelance / india / remote / international)
+2. Click your saved dashboard links
+3. Check for new opportunities
+4. Apply and update the status column
+
+> Each file has editable columns for `My Profile/Dashboard` links and `Status` tracking so you can manage everything from these files.
 
 ---
 
@@ -116,7 +148,7 @@ The [`interview_experiences/Mine/`](./interview_experiences/Mine/) folder stores
 
 ## 📄 Resume
 
-The [`Resume/`](./Resume/) folder contains all versions of my resume, tailored for different contexts.
+The [`job_hunt/Resume/`](./job_hunt/Resume/) folder contains all versions of my resume, tailored for different contexts.
 
 ### 📂 Layout
 
@@ -152,10 +184,12 @@ Sep 2024 – Apr 2026   →  Senior Data Engineer @ Sequoia
 
 ## 💡 How I Use This Repo
 
-1. **After every interview** → Add the problems I faced to the relevant company folder under `interview_experiences/`
-2. **While preparing** → Work through the roadmap phases in `data_engineering_roadmap/`, filling in notes and examples
-3. **When applying** → Pull from `Resume/` and tailor for the role
-4. **For long-term growth** → Come back and see how my thinking has evolved
+1. **Every morning** → Open [`job_hunt/`](./job_hunt/) trackers, click dashboard links, check for new opportunities
+2. **After every interview** → Add the problems I faced to the relevant company folder under `interview_experiences/`
+3. **While preparing** → Work through the roadmap phases in `data_engineering_roadmap/`, filling in notes and examples
+4. **When applying** → Pull from [`job_hunt/Resume/`](./job_hunt/Resume/) and tailor for the role
+5. **Weekly** → Update platform statuses, re-order sites based on results
+6. **For long-term growth** → Come back and see how my thinking has evolved
 
 ---
 
