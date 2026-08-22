@@ -124,3 +124,19 @@ O-O -> Castling
  
   
 """
+
+
+
+"""
+
+I have a page called funfinancelab by harsha 
+My plan is to teach indians about finance in a fun and intresting way 
+I want a song which explains the the issues people face when they lack financial independence and  that school or education does not teachs it in the same song I want to explain solution like possible investment options and their meaning in a fun and clear way in telugu .
+Lyrics should be quirky, funny and use viral words or sentences where ever possible 
+use viral words movie references viral events happening in ap and telengana with some hook which might make it viral hook should be small and repititive and easy to remember or else it'll bea hard for people to remember and relevant to my page
+
+don't include my name or page name I want this to be finance youth anthem not just restricted to my page or me where they have to know current education/financial system is rigged and only way to succed is by investing correctly in right products and explaining about the products 
+make hook viral worthy
+the song should be exactly 60 seconds and should feel like a massy telugu filmy song 
+
+"""
