@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FreightLens Data Platform Design</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11pt; line-height: 1.65; color: #1a1a2e; background: #fff; max-width: 900px; margin: 0 auto; padding: 32px 40px; }
+  .doc-header { border-bottom: 3px solid #1565c0; padding-bottom: 16px; margin-bottom: 28px; }
+  .doc-header h1 { font-size: 20pt; color: #1565c0; font-weight: 700; margin-bottom: 4px; }
+  .doc-header .subtitle { font-size: 12pt; color: #37474f; font-weight: 500; margin-bottom: 6px; }
+  .doc-header .meta { font-size: 9.5pt; color: #78909c; }
+  h2 { font-size: 15pt; color: #1565c0; font-weight: 700; border-left: 4px solid #1565c0; padding-left: 12px; margin: 36px 0 14px 0; }
+  h3 { font-size: 12pt; color: #263238; font-weight: 600; margin: 20px 0 8px 0; }
+  h4 { font-size: 11pt; color: #37474f; font-weight: 600; margin: 14px 0 6px 0; }
+  p { margin-bottom: 10px; }
+  ul, ol { padding-left: 22px; margin-bottom: 10px; }
+  li { margin-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 16px 0; font-size: 9.5pt; }
+  th { background: #e3f2fd; color: #1565c0; font-weight: 600; padding: 8px 10px; text-align: left; border: 1px solid #b0bec5; }
+  td { padding: 7px 10px; border: 1px solid #cfd8dc; vertical-align: top; }
+  tr:nth-child(even) td { background: #f9fbe7; }
+  .code { background: #f5f5f5; border: 1px solid #e0e0e0; border-left: 3px solid #1565c0; border-radius: 0 4px 4px 0; padding: 11px 14px; font-family: 'Courier New', monospace; font-size: 9pt; margin: 10px 0; white-space: pre; overflow-x: auto; line-height: 1.5; }
+  .callout { background: #fff8e1; border-left: 4px solid #ffa000; padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; font-size: 10pt; }
+  .callout strong { color: #e65100; }
+  .callout-blue { background: #e3f2fd; border-left: 4px solid #1565c0; padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; font-size: 10pt; }
+  .failure-box { border: 1.5px solid #ef5350; border-radius: 8px; padding: 16px; margin: 16px 0; background: #fff5f5; }
+  .failure-box h4 { color: #c62828; margin-top: 0; }
+  .failure-label { display: inline-block; background: #c62828; color: white; font-size: 8.5pt; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-bottom: 8px; }
+  .diagram-wrap { margin: 18px 0; padding: 12px; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 6px; text-align: center; }
+  .diagram-wrap svg { max-width: 100%; }
+  .diagram-caption { font-size: 9pt; color: #78909c; font-style: italic; margin-top: 8px; }
+  hr { border: none; border-top: 1px solid #e0e0e0; margin: 30px 0; }
+  @media print {
+    body { padding: 0; font-size: 8.5pt; line-height: 1.4; color: #000; }
+    h2, h3, h4 { page-break-after: avoid; break-after: avoid; }
+    h2 { margin-top: 14px; margin-bottom: 6px; page-break-before: auto; break-before: auto; }
+    h3 { margin-top: 10px; margin-bottom: 4px; }
+    h4 { margin-top: 8px; margin-bottom: 3px; }
+    p { margin-bottom: 5px; }
+    ul, ol { margin-bottom: 5px; }
+    .diagram-wrap { page-break-inside: avoid; break-inside: avoid; margin: 6px 0; padding: 4px; }
+    .diagram-wrap svg { max-height: 160px; width: auto; margin: 0 auto; display: block; }
+    .failure-box { page-break-inside: avoid; break-inside: avoid; margin: 6px 0; padding: 8px 12px; }
+    .failure-box h4, .failure-box p, .failure-box ul, .failure-box li { page-break-inside: avoid; break-inside: avoid; }
+    table { page-break-inside: avoid; break-inside: avoid; margin: 6px 0; }
+    tr { page-break-inside: avoid; break-inside: avoid; }
+    th, td { padding: 4px 6px; }
+    hr { margin: 8px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SECTION 1 -->
+<h2>1. Data Organization Design</h2>
+
+<h3>1.1 Architecture Overview</h3>
+<p>FreightLens ingests data from three sources with fundamentally different reliability profiles: a high-trust core system, a medium-trust AI extraction agent (5-8% error rate), and third-party external feeds with variable freshness. The central challenge is unifying these into a single, agent-queryable surface while ensuring bad data from the AI extraction layer cannot silently corrupt recommendations built on core system data.</p>
+<p>I chose a <strong>three-layer Medallion Architecture (Bronze &rarr; Silver &rarr; Gold)</strong> on ClickHouse. Each layer has a distinct contract: Bronze stores everything unmodified, Silver applies quality and enrichment logic, and Gold exposes only business-ready views with freshness guarantees that agents query directly.</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 860 390" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#546e7a"/></marker>
+    <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#4527a0"/></marker>
+  </defs>
+  <rect width="860" height="390" fill="#fafafa" rx="8"/>
+  <text x="430" y="26" text-anchor="middle" font-size="13" font-weight="700" fill="#263238">Data Organization Architecture &mdash; Medallion Pattern on ClickHouse</text>
+  <!-- SOURCES -->
+  <rect x="8" y="48" width="152" height="68" rx="6" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="84" y="70" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1565c0">Core Product Systems</text>
+  <text x="84" y="86" text-anchor="middle" font-size="9" fill="#1e88e5">Bookings &middot; Contracts</text>
+  <text x="84" y="100" text-anchor="middle" font-size="9" fill="#1e88e5">Tracking Events (PostgreSQL)</text>
+  <rect x="8" y="165" width="152" height="68" rx="6" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+  <text x="84" y="186" text-anchor="middle" font-size="10.5" font-weight="700" fill="#2e7d32">AI Email Extraction</text>
+  <text x="84" y="202" text-anchor="middle" font-size="9" fill="#43a047">Parses forwarder emails</text>
+  <text x="84" y="217" text-anchor="middle" font-size="9" fill="#43a047">&rarr; structured bookings/rates</text>
+  <rect x="8" y="282" width="152" height="68" rx="6" fill="#fff3e0" stroke="#bf360c" stroke-width="1.5"/>
+  <text x="84" y="303" text-anchor="middle" font-size="10.5" font-weight="700" fill="#bf360c">External Sources</text>
+  <text x="84" y="319" text-anchor="middle" font-size="9" fill="#e64a19">Freightos rate index</text>
+  <text x="84" y="334" text-anchor="middle" font-size="9" fill="#e64a19">Port data &middot; News feeds</text>
+  <!-- Source arrows -->
+  <line x1="160" y1="82" x2="222" y2="130" stroke="#546e7a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="160" y1="199" x2="222" y2="199" stroke="#546e7a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="160" y1="316" x2="222" y2="270" stroke="#546e7a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="182" y="100" text-anchor="middle" font-size="8.5" fill="#546e7a" font-style="italic">CDC/Debezium</text>
+  <text x="188" y="192" text-anchor="middle" font-size="8.5" fill="#546e7a" font-style="italic">Event Push</text>
+  <text x="185" y="308" text-anchor="middle" font-size="8.5" fill="#546e7a" font-style="italic">Hourly Batch</text>
+  <!-- BRONZE -->
+  <rect x="222" y="38" width="118" height="324" rx="6" fill="#efebe9" stroke="#6d4c41" stroke-width="2"/>
+  <text x="281" y="60" text-anchor="middle" font-size="12" font-weight="700" fill="#4e342e">BRONZE</text>
+  <text x="281" y="76" text-anchor="middle" font-size="8.5" fill="#6d4c41">Raw Storage</text>
+  <line x1="222" y1="83" x2="340" y2="83" stroke="#a1887f" stroke-width="1"/>
+  <rect x="230" y="92" width="102" height="36" rx="3" fill="white" fill-opacity="0.75" stroke="#bcaaa4" stroke-width="1"/>
+  <text x="281" y="108" text-anchor="middle" font-size="8.5" font-weight="600" fill="#4e342e">raw_bookings</text>
+  <text x="281" y="122" text-anchor="middle" font-size="8" fill="#795548">raw_tracking_events</text>
+  <rect x="230" y="135" width="102" height="26" rx="3" fill="white" fill-opacity="0.75" stroke="#bcaaa4" stroke-width="1"/>
+  <text x="281" y="152" text-anchor="middle" font-size="8.5" font-weight="600" fill="#4e342e">raw_ai_bookings</text>
+  <rect x="230" y="168" width="102" height="36" rx="3" fill="white" fill-opacity="0.75" stroke="#bcaaa4" stroke-width="1"/>
+  <text x="281" y="184" text-anchor="middle" font-size="8.5" font-weight="600" fill="#4e342e">raw_market_rates</text>
+  <text x="281" y="198" text-anchor="middle" font-size="8" fill="#795548">raw_port_data</text>
+  <rect x="230" y="330" width="102" height="24" rx="3" fill="#fffaf9" stroke="#bcaaa4" stroke-width="1" stroke-dasharray="4"/>
+  <text x="281" y="346" text-anchor="middle" font-size="7.5" fill="#795548">Append-only. Never deleted.</text>
+  <!-- Bronze->Silver -->
+  <line x1="340" y1="199" x2="360" y2="199" stroke="#546e7a" stroke-width="2" marker-end="url(#arr)"/>
+  <!-- SILVER -->
+  <rect x="360" y="38" width="120" height="324" rx="6" fill="#eceff1" stroke="#546e7a" stroke-width="2"/>
+  <text x="420" y="60" text-anchor="middle" font-size="12" font-weight="700" fill="#37474f">SILVER</text>
+  <text x="420" y="76" text-anchor="middle" font-size="8.5" fill="#546e7a">Cleaned &amp; Validated</text>
+  <line x1="360" y1="83" x2="480" y2="83" stroke="#90a4ae" stroke-width="1"/>
+  <rect x="368" y="92" width="104" height="90" rx="3" fill="white" fill-opacity="0.85" stroke="#90a4ae" stroke-width="1"/>
+  <text x="420" y="109" text-anchor="middle" font-size="8.5" font-weight="700" fill="#37474f">clean_bookings</text>
+  <text x="420" y="123" text-anchor="middle" font-size="7.5" fill="#546e7a">+ tenant_id (validated)</text>
+  <text x="420" y="136" text-anchor="middle" font-size="7.5" fill="#546e7a">+ confidence_score</text>
+  <text x="420" y="149" text-anchor="middle" font-size="7.5" fill="#546e7a">+ data_source</text>
+  <text x="420" y="162" text-anchor="middle" font-size="7.5" fill="#546e7a">+ is_valid / rejection_reason</text>
+  <text x="420" y="175" text-anchor="middle" font-size="7.5" fill="#546e7a">+ ingested_at</text>
+  <rect x="368" y="191" width="104" height="44" rx="3" fill="white" fill-opacity="0.85" stroke="#90a4ae" stroke-width="1"/>
+  <text x="420" y="208" text-anchor="middle" font-size="8.5" font-weight="700" fill="#37474f">clean_tracking_events</text>
+  <text x="420" y="222" text-anchor="middle" font-size="7.5" fill="#546e7a">+ is_stale (now-ingested&gt;6h)</text>
+  <text x="420" y="235" text-anchor="middle" font-size="7.5" fill="#546e7a">+ ingested_at</text>
+  <rect x="368" y="244" width="104" height="44" rx="3" fill="white" fill-opacity="0.85" stroke="#90a4ae" stroke-width="1"/>
+  <text x="420" y="261" text-anchor="middle" font-size="8.5" font-weight="700" fill="#37474f">clean_market_rates</text>
+  <text x="420" y="275" text-anchor="middle" font-size="7.5" fill="#546e7a">+ is_rate_outlier (&gt;3x median)</text>
+  <text x="420" y="288" text-anchor="middle" font-size="7.5" fill="#546e7a">+ last_updated_at</text>
+  <rect x="368" y="330" width="104" height="24" rx="3" fill="#fff8e1" stroke="#90a4ae" stroke-width="1" stroke-dasharray="4"/>
+  <text x="420" y="346" text-anchor="middle" font-size="7.5" fill="#546e7a">Invalid &rarr; human review queue</text>
+  <!-- Silver->Gold -->
+  <line x1="480" y1="199" x2="500" y2="199" stroke="#546e7a" stroke-width="2" marker-end="url(#arr)"/>
+  <!-- GOLD -->
+  <rect x="500" y="38" width="120" height="324" rx="6" fill="#fff8e1" stroke="#f57f17" stroke-width="2"/>
+  <text x="560" y="60" text-anchor="middle" font-size="12" font-weight="700" fill="#e65100">GOLD</text>
+  <text x="560" y="76" text-anchor="middle" font-size="8.5" fill="#f57f17">Serving Layer</text>
+  <line x1="500" y1="83" x2="620" y2="83" stroke="#ffcc02" stroke-width="1"/>
+  <rect x="508" y="92" width="104" height="38" rx="3" fill="white" fill-opacity="0.9" stroke="#ffca28" stroke-width="1"/>
+  <text x="560" y="109" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e65100">delayed_shipments</text>
+  <text x="560" y="122" text-anchor="middle" font-size="7.5" fill="#f57f17">is_stale = false only</text>
+  <rect x="508" y="139" width="104" height="38" rx="3" fill="white" fill-opacity="0.9" stroke="#ffca28" stroke-width="1"/>
+  <text x="560" y="156" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e65100">rate_comparison</text>
+  <text x="560" y="169" text-anchor="middle" font-size="7.5" fill="#f57f17">conf &ge;0.85, outlier=false</text>
+  <rect x="508" y="186" width="104" height="38" rx="3" fill="white" fill-opacity="0.9" stroke="#ffca28" stroke-width="1"/>
+  <text x="560" y="203" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e65100">rebid_candidates</text>
+  <text x="560" y="216" text-anchor="middle" font-size="7.5" fill="#f57f17">market 10%+ cheaper</text>
+  <rect x="508" y="233" width="104" height="38" rx="3" fill="white" fill-opacity="0.9" stroke="#ffca28" stroke-width="1"/>
+  <text x="560" y="250" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e65100">lane_benchmarks</text>
+  <text x="560" y="263" text-anchor="middle" font-size="7.5" fill="#f57f17">anonymized aggregates</text>
+  <rect x="508" y="330" width="104" height="24" rx="3" fill="#fffde7" stroke="#ffca28" stroke-width="1" stroke-dasharray="4"/>
+  <text x="560" y="346" text-anchor="middle" font-size="7.5" fill="#f57f17">SELECT only &middot; agents query here</text>
+  <!-- Gold->consumers -->
+  <line x1="620" y1="155" x2="648" y2="130" stroke="#4527a0" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <line x1="620" y1="200" x2="648" y2="220" stroke="#4527a0" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <line x1="620" y1="250" x2="648" y2="305" stroke="#4527a0" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <!-- CONSUMERS -->
+  <rect x="648" y="95" width="200" height="52" rx="6" fill="#ede7f6" stroke="#4527a0" stroke-width="1.5"/>
+  <text x="748" y="118" text-anchor="middle" font-size="11" font-weight="700" fill="#4527a0">AI Agents</text>
+  <text x="748" y="136" text-anchor="middle" font-size="8.5" fill="#5e35b1">Natural language to SQL queries</text>
+  <rect x="648" y="194" width="200" height="52" rx="6" fill="#ede7f6" stroke="#4527a0" stroke-width="1.5"/>
+  <text x="748" y="217" text-anchor="middle" font-size="11" font-weight="700" fill="#4527a0">Analytics</text>
+  <text x="748" y="235" text-anchor="middle" font-size="8.5" fill="#5e35b1">Internal dashboards &middot; Reports</text>
+  <rect x="648" y="285" width="200" height="52" rx="6" fill="#ede7f6" stroke="#4527a0" stroke-width="1.5"/>
+  <text x="748" y="308" text-anchor="middle" font-size="11" font-weight="700" fill="#4527a0">Data Science</text>
+  <text x="748" y="326" text-anchor="middle" font-size="8.5" fill="#5e35b1">Benchmark models</text>
+</svg>
+<div class="diagram-caption">Figure 1: Data Organization Architecture &mdash; 3 sources through Bronze/Silver/Gold layers to agent consumption</div>
+</div>
+
+<h3>1.2 Ingestion Paths</h3>
+<table>
+  <tr><th>Source</th><th>What it brings</th><th>Ingestion method</th><th>Trust level</th></tr>
+  <tr><td><strong>Core product systems</strong></td><td>Authoritative structured data: bookings, contracts, tracking events from the FreightLens PostgreSQL application database</td><td>CDC via Debezium watching the PostgreSQL WAL log. Seconds-level latency with no additional query load on the production database.</td><td>High &mdash; source of truth</td></tr>
+  <tr><td><strong>AI email extraction agent</strong></td><td>Spot rate offers and booking confirmations parsed from forwarder emails into structured JSON</td><td>Event push &mdash; the agent writes one record per parsed email to Bronze. No streaming infrastructure needed for discrete per-email events.</td><td>Medium &mdash; 5-8% error rate</td></tr>
+  <tr><td><strong>External sources</strong></td><td>Market rate benchmarks (Freightos), port congestion alerts, carrier schedule updates</td><td>Hourly batch API poll with idempotent upsert. Sufficient &mdash; freight market rates do not change meaningfully faster than hourly.</td><td>Medium &mdash; third-party availability varies</td></tr>
+</table>
+
+<h3>1.3 Stage Breakdown</h3>
+<h4>Bronze &mdash; Raw Storage</h4>
+<p>Append-only. Every record from every source is written here unchanged. No transformations, no deletions. If Silver validation logic changes, Bronze provides the clean replay substrate.</p>
+<table>
+  <tr><th>Attribute</th><th>Detail</th></tr>
+  <tr><td>Tables</td><td>raw_bookings, raw_tracking_events, raw_contracts, raw_ai_extracted_bookings, raw_market_rates, raw_port_data</td></tr>
+  <tr><td>Added metadata</td><td>source_tag, arrived_at timestamp, system-generated raw_id. Nothing else.</td></tr>
+  <tr><td>Rejected records</td><td>Nothing is rejected at Bronze. Completely malformed payloads are stored with a parse_error flag &mdash; never silently dropped.</td></tr>
+</table>
+
+<h4>Silver &mdash; Cleaned &amp; Validated</h4>
+<p>All data quality logic lives here. Rejected records stay in Silver with a populated rejection_reason &mdash; never silently discarded. AI-extracted records below the confidence threshold enter a human review queue.</p>
+<table>
+  <tr><th>Validation / Enrichment</th><th>Rule applied</th></tr>
+  <tr><td>tenant_id check</td><td>Must be present and match a known tenant in the registry. Missing &rarr; is_valid = false.</td></tr>
+  <tr><td>Rate outlier check</td><td>Rate must be within 0.1&times;&ndash;10&times; the rolling median for that lane (from core_system records only). Outside range &rarr; is_rate_outlier = true &rarr; does NOT promote to Gold.</td></tr>
+  <tr><td>Date logic</td><td>ETD must precede ETA. Both must be valid calendar values.</td></tr>
+  <tr><td>Deduplication</td><td>On (booking_id, data_source) pair &mdash; CDC can deliver the same event twice during recovery.</td></tr>
+  <tr><td>confidence_score</td><td>1.0 for core_system (authoritative). AI model&rsquo;s own confidence for email extractions. 0.95 for external API records.</td></tr>
+  <tr><td>is_stale</td><td>Computed for tracking events: true if (now() &minus; ingested_at) &gt; 6 hours. Primary guard against the ghost-delay failure mode.</td></tr>
+  <tr><td>human_verified</td><td>Defaults to false for all AI-extracted records. Flipped to true via the ops review queue after manual confirmation.</td></tr>
+</table>
+
+<h4>Gold &mdash; Serving Layer</h4>
+<p>Business-ready views that agents query directly. Freshness and confidence guarantees are structural &mdash; not optional filters agents might forget to apply.</p>
+<table>
+  <tr><th>View</th><th>Contains</th><th>Key constraint</th></tr>
+  <tr><td><strong>delayed_shipments</strong></td><td>Shipments where latest tracking event indicates delay</td><td>is_stale = false enforced in view definition</td></tr>
+  <tr><td><strong>rate_comparison</strong></td><td>Contract vs. market vs. spot rates per shipment</td><td>confidence_score &ge;0.85 AND is_rate_outlier = false for all rates</td></tr>
+  <tr><td><strong>rebid_candidates</strong></td><td>Shipments where a verified lower rate exists on the lane</td><td>Market rate &ge;10% cheaper than contract; inherits rate_comparison constraints</td></tr>
+  <tr><td><strong>lane_benchmarks</strong></td><td>Anonymized aggregate rates per lane across all standard-tier tenants</td><td>No tenant_id. Only median, p25, p75, client_count. Minimum client_count = 5 (privacy floor). Refreshed nightly.</td></tr>
+</table>
+
+<h3>1.4 Key Schema Sketches</h3>
+<div class="code">-- Silver: clean_bookings
+booking_id          VARCHAR      -- From source system
+tenant_id           VARCHAR      -- Critical: enforced at every layer
+origin_port         VARCHAR
+destination_port    VARCHAR
+carrier             VARCHAR
+contract_rate       DECIMAL(12,2)
+etd                 DATETIME     -- Expected Time of Departure
+eta                 DATETIME     -- Expected Time of Arrival
+status              ENUM('active','delayed','completed','cancelled')
+data_source         ENUM('core_system','ai_email','external_api')
+confidence_score    FLOAT        -- 1.0 for core_system; AI model score for email
+is_rate_outlier     BOOLEAN      -- True if rate deviates &gt;3x lane median
+human_verified      BOOLEAN      -- False by default for AI-extracted records
+is_valid            BOOLEAN      -- Passed all Silver validations?
+rejection_reason    VARCHAR      -- Populated if is_valid = false
+ingested_at         DATETIME     -- When WE received this record (for freshness)
+event_time          DATETIME     -- When the booking occurred at source</div>
+
+<div class="code">-- Silver: clean_tracking_events
+event_id            VARCHAR
+booking_id          VARCHAR      -- FK to clean_bookings
+tenant_id           VARCHAR      -- Enables tenant-scoped queries without JOIN
+event_type          ENUM('departed','delayed','arrived','customs_hold','port_congestion')
+new_etd             DATETIME     -- Populated when event_type = 'delayed'
+event_time          DATETIME     -- When the event occurred at carrier/port
+ingested_at         DATETIME     -- When WE received it (different from event_time)
+is_stale            BOOLEAN      -- Computed: (now() - ingested_at) &gt; 6 hours
+data_source         VARCHAR</div>
+
+<h3>1.5 Architecture Justification</h3>
+<table>
+  <tr><th>Alternative considered</th><th>Why ruled out</th></tr>
+  <tr><td>Two-layer model (raw + serving only)</td><td>AI-extracted data at 5-8% error rate needs an intermediate quarantine and confidence-scoring stage. Merging this directly into a serving layer creates fragile, hard-to-maintain views with complex conditional logic that is difficult to test and reason about.</td></tr>
+  <tr><td>Lambda architecture (parallel batch + streaming)</td><td>Two parallel pipelines maintaining consistency is operationally expensive for a 4-person team. CDC at seconds-level latency eliminates the streaming need without the operational burden.</td></tr>
+  <tr><td>Agent queries directly on OLTP (PostgreSQL)</td><td>Analytical queries scanning millions of rows degrade production app performance. Non-negotiable separation required.</td></tr>
+</table>
+
+<hr/>
+
+<!-- SECTION 2 -->
+<h2>2. Access Architecture</h2>
+
+<h3>2.1 All System Participants and Their Access Paths</h3>
+<table>
+  <tr><th>Participant</th><th>Access path</th><th>Permitted layer</th><th>Constraint</th></tr>
+  <tr><td>Client users (ops, managers)</td><td>Via AI agent only &mdash; no direct DB access</td><td>Gold (via agent)</td><td>Scoped to own tenant_id at middleware layer</td></tr>
+  <tr><td>AI agents</td><td>Query middleware &rarr; ClickHouse Gold</td><td>Gold only</td><td>SELECT only; tenant_id auto-injected; no Silver or Bronze access</td></tr>
+  <tr><td>Data Science / Analytics</td><td>Read-only ClickHouse credentials (internal)</td><td>Silver + Gold</td><td>Tenant-scoped credentials; cross-tenant only via lane_benchmarks</td></tr>
+  <tr><td>CDC pipeline (Debezium)</td><td>Dedicated writer service account</td><td>Bronze (write only)</td><td>Cannot read; write-only</td></tr>
+  <tr><td>AI extraction agent</td><td>Writer API endpoint</td><td>Bronze (write only)</td><td>Cannot read other tenants' Bronze data</td></tr>
+  <tr><td>Silver processing pipeline</td><td>Scheduled job (service account)</td><td>Bronze (read), Silver (write)</td><td>Cannot access Gold or production OLTP</td></tr>
+  <tr><td>FreightLens ops team</td><td>Human review queue UI</td><td>Silver (targeted update)</td><td>Can only update human_verified flag on flagged rows</td></tr>
+</table>
+
+<h3>2.2 Tenant Isolation Strategy</h3>
+<p>Every Silver and Gold table contains a <strong>tenant_id column</strong>. Isolation is enforced by a Query Middleware layer &mdash; a structural guarantee, not a coding convention that agents might accidentally violate.</p>
+<h4>How the middleware works</h4>
+<ol>
+  <li>Extracts <code>tenant_id</code> from the authenticated user's JWT token</li>
+  <li>Parses the generated SQL into an abstract syntax tree (AST)</li>
+  <li>Injects <code>AND tenant_id = '{tenant_id}'</code> into the WHERE clause of every table reference</li>
+  <li>Validates the injection succeeded before dispatching to ClickHouse</li>
+</ol>
+<div class="code">-- Agent generates (no tenant filter):
+SELECT * FROM delayed_shipments WHERE week = current_week()
+
+-- Middleware transforms to:
+SELECT * FROM delayed_shipments
+WHERE week = current_week()
+  AND tenant_id = 'tata_motors'    -- injected automatically from JWT</div>
+
+<div class="callout"><strong>Fallback behavior:</strong> If the middleware cannot resolve a tenant_id (JWT missing, expired, or malformed), the query is <em>rejected immediately</em> &mdash; never reaches ClickHouse. The agent returns: "Session expired, please re-authenticate." No silent data leakage is possible in this failure path.</div>
+
+<h3>2.3 Dedicated Database for Enterprise Tier</h3>
+<p>The Sales requirement for a fully dedicated ClickHouse instance is handled via a <strong>Connection Router</strong> &mdash; a transparent abstraction requiring zero changes to agent code.</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 700 230" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',sans-serif">
+  <defs><marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#546e7a"/></marker></defs>
+  <rect width="700" height="230" fill="#fafafa" rx="8"/>
+  <text x="350" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#263238">Connection Router &mdash; Dedicated DB Coexistence Model</text>
+  <rect x="30" y="90" width="120" height="52" rx="6" fill="#ede7f6" stroke="#4527a0" stroke-width="1.5"/>
+  <text x="90" y="112" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4527a0">AI Agent</text>
+  <text x="90" y="130" text-anchor="middle" font-size="8.5" fill="#5e35b1">Same code for all tiers</text>
+  <line x1="150" y1="116" x2="195" y2="116" stroke="#546e7a" stroke-width="1.5" marker-end="url(#arr3)"/>
+  <rect x="195" y="76" width="140" height="78" rx="6" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+  <text x="265" y="102" text-anchor="middle" font-size="10.5" font-weight="700" fill="#2e7d32">Connection Router</text>
+  <text x="265" y="118" text-anchor="middle" font-size="8.5" fill="#388e3c">Looks up tenant_id in</text>
+  <text x="265" y="132" text-anchor="middle" font-size="8.5" fill="#388e3c">tenant_registry table</text>
+  <text x="265" y="146" text-anchor="middle" font-size="8.5" fill="#388e3c">&rarr; routes to correct DB</text>
+  <rect x="415" y="40" width="265" height="66" rx="6" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="547" y="63" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1565c0">Shared ClickHouse Cluster</text>
+  <text x="547" y="79" text-anchor="middle" font-size="8.5" fill="#1976d2">Standard tier &mdash; ~399 tenants</text>
+  <text x="547" y="95" text-anchor="middle" font-size="8.5" fill="#1976d2">Multi-tenant with row-level isolation</text>
+  <rect x="415" y="125" width="265" height="66" rx="6" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
+  <text x="547" y="148" text-anchor="middle" font-size="10.5" font-weight="700" fill="#e65100">Dedicated ClickHouse Instance</text>
+  <text x="547" y="164" text-anchor="middle" font-size="8.5" fill="#bf360c">Enterprise tier (e.g., Amazon India)</text>
+  <text x="547" y="180" text-anchor="middle" font-size="8.5" fill="#bf360c">Own CDC stream &middot; Full physical isolation</text>
+  <line x1="335" y1="100" x2="415" y2="73" stroke="#546e7a" stroke-width="1.5" marker-end="url(#arr3)"/>
+  <line x1="335" y1="133" x2="415" y2="158" stroke="#546e7a" stroke-width="1.5" marker-end="url(#arr3)"/>
+  <text x="376" y="82" text-anchor="middle" font-size="8" fill="#546e7a" font-style="italic">tier = standard</text>
+  <text x="376" y="155" text-anchor="middle" font-size="8" fill="#546e7a" font-style="italic">tier = enterprise</text>
+</svg>
+<div class="diagram-caption">Figure 2: Connection Router &mdash; same agent code, different ClickHouse target per tenant tier</div>
+</div>
+
+<div class="code">tenant_registry:
+tenant_id     | tier        | clickhouse_host               | db_name
+tata_motors   | standard    | shared-ch.freightlens:9000    | freightlens_prod
+reliance      | standard    | shared-ch.freightlens:9000    | freightlens_prod
+amazon_india  | enterprise  | amazon-ch.freightlens:9000    | amazon_fl_prod</div>
+
+<p>The enterprise client's ClickHouse instance receives its own dedicated CDC stream from Debezium. It is excluded from the nightly lane_benchmarks aggregation job per their isolation requirement (agreed as part of the enterprise tier contract &mdash; they opt out of cross-client benchmarks).</p>
+
+<h3>2.4 Cross-Client Benchmarks Without Violating Isolation</h3>
+<p>Data Science wants: "You pay 15% above market on Chennai-Hamburg." This requires aggregating across tenants. A nightly anonymization job aggregates rates per lane across all standard-tier tenants &mdash; no tenant identifiers in the output. Individual client rates are never exposed to another tenant.</p>
+<div class="callout"><strong>Privacy boundary:</strong> lane_benchmarks stores only: lane, median_rate, p25_rate, p75_rate, and client_count. client_count minimum threshold = 5. Lanes with fewer than 5 clients are suppressed to prevent reverse-engineering individual rates from aggregates.</div>
+
+<h3>2.5 NL &rarr; SQL Safety Pipeline</h3>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 840 160" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',sans-serif">
+  <defs>
+    <marker id="arr4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#546e7a"/></marker>
+    <marker id="arr5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#c62828"/></marker>
+  </defs>
+  <rect width="840" height="160" fill="#fafafa" rx="8"/>
+  <text x="420" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#263238">NL &rarr; SQL Safety Pipeline &mdash; 4 Validation Gates</text>
+  <rect x="10" y="40" width="105" height="56" rx="6" fill="#ede7f6" stroke="#4527a0" stroke-width="1.5"/>
+  <text x="62" y="63" text-anchor="middle" font-size="9" font-weight="700" fill="#4527a0">1 User Input</text>
+  <text x="62" y="77" text-anchor="middle" font-size="8" fill="#5e35b1">Natural language</text>
+  <text x="62" y="89" text-anchor="middle" font-size="8" fill="#5e35b1">from client</text>
+  <line x1="115" y1="68" x2="133" y2="68" stroke="#546e7a" stroke-width="1.5" marker-end="url(#arr4)"/>
+  <rect x="133" y="40" width="110" height="56" rx="6" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+  <text x="188" y="63" text-anchor="middle" font-size="9" font-weight="700" fill="#2e7d32">2 LLM</text>
+  <text x="188" y="77" text-anchor="middle" font-size="8" fill="#388e3c">Converts to SQL</text>
+  <text x="188" y="89" text-anchor="middle" font-size="8" fill="#388e3c">Gold schema as context</text>
+  <line x1="243" y1="68" x2="261" y2="68" stroke="#546e7a" stroke-width="1.5" marker-end="url(#arr4)"/>
+  <rect x="261" y="40" width="115" height="56" rx="6" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
+  <text x="318" y="60" text-anchor="middle" font-size="9" font-weight="700" fill="#e65100">3 SQL Validator</text>
+  <text x="318" y="74" text-anchor="middle" font-size="8" fill="#bf360c">SELECT only?</text>
+  <text x="318" y="86" text-anchor="middle" font-size="8" fill="#bf360c">Gold tables only?</text>
+  <line x1="318" y1="96" x2="318" y2="130" stroke="#c62828" stroke-width="1.5" marker-end="url(#arr5)" stroke-dasharray="4"/>
+  <text x="318" y="148" text-anchor="middle" font-size="8" fill="#c62828">REJECT</text>
+  <line x1="376" y1="68" x2="394" y2="68" stroke="#546e7a" stroke-width="1.5" marker-end="url(#arr4)"/>
+  <rect x="394" y="40" width="125" height="56" rx="6" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+  <text x="456" y="60" text-anchor="middle" font-size="9" font-weight="700" fill="#1565c0">4 Tenant Middleware</text>
+  <text x="456" y="74" text-anchor="middle" font-size="8" fill="#1976d2">Inject tenant_id from JWT</text>
+  <text x="456" y="86" text-anchor="middle" font-size="8" fill="#1976d2">into all table references</text>
+  <line x1="456" y1="96" x2="456" y2="130" stroke="#c62828" stroke-width="1.5" marker-end="url(#arr5)" stroke-dasharray="4"/>
+  <text x="456" y="148" text-anchor="middle" font-size="8" fill="#c62828">REJECT (no JWT)</text>
+  <line x1="519" y1="68" x2="537" y2="68" stroke="#546e7a" stroke-width="1.5" marker-end="url(#arr4)"/>
+  <rect x="537" y="40" width="115" height="56" rx="6" fill="#eceff1" stroke="#546e7a" stroke-width="1.5"/>
+  <text x="594" y="63" text-anchor="middle" font-size="9" font-weight="700" fill="#37474f">5 Execute</text>
+  <text x="594" y="77" text-anchor="middle" font-size="8" fill="#546e7a">ClickHouse Gold</text>
+  <text x="594" y="89" text-anchor="middle" font-size="8" fill="#546e7a">Read-only credentials</text>
+  <line x1="652" y1="68" x2="670" y2="68" stroke="#546e7a" stroke-width="1.5" marker-end="url(#arr4)"/>
+  <rect x="670" y="40" width="155" height="56" rx="6" fill="#e8eaf6" stroke="#3949ab" stroke-width="1.5"/>
+  <text x="747" y="60" text-anchor="middle" font-size="9" font-weight="700" fill="#3949ab">6 Response Formatter</text>
+  <text x="747" y="74" text-anchor="middle" font-size="8" fill="#3949ab">Format result</text>
+  <text x="747" y="86" text-anchor="middle" font-size="8" fill="#3949ab">+ freshness annotation</text>
+</svg>
+<div class="diagram-caption">Figure 3: NL &rarr; SQL pipeline &mdash; query passes 4 validation gates before reaching ClickHouse</div>
+</div>
+
+<table>
+  <tr><th>Step</th><th>Component</th><th>What happens</th><th>Rejection condition</th></tr>
+  <tr><td>1</td><td>User</td><td>Types natural language query in FreightLens UI</td><td>&mdash;</td></tr>
+  <tr><td>2</td><td>LLM (SQL Generator)</td><td>Converts NL to SQL using Gold schema as system prompt context</td><td>&mdash;</td></tr>
+  <tr><td>3</td><td>SQL Validator</td><td>Parses SQL AST; checks statement type and table references</td><td>Non-SELECT statement; reference to Bronze/Silver tables; unknown columns</td></tr>
+  <tr><td>4</td><td>Tenant Middleware</td><td>Extracts tenant_id from JWT; injects filter into all table WHERE clauses</td><td>JWT missing, expired, or tenant_id unresolvable</td></tr>
+  <tr><td>5</td><td>ClickHouse Gold</td><td>Executes query with read-only service account; 30-second timeout enforced</td><td>Query timeout</td></tr>
+  <tr><td>6</td><td>Response Formatter</td><td>Agent formats result and appends freshness annotation ("data as of X hours ago") &mdash; mandatory on all responses involving tracking data</td><td>&mdash;</td></tr>
+</table>
+
+<hr/>
+
+<!-- SECTION 3 -->
+<h2>3. End-to-End Trace</h2>
+
+<div class="callout-blue"><strong>Scenario:</strong> Rajesh, a logistics manager at Tata Motors, asks the FreightLens agent: <em>"Which of our shipments have delayed ETDs this week? Should we consider rebidding any lanes?"</em></div>
+
+<table>
+  <tr><th>Step</th><th>Component</th><th>What happens</th><th>Data access / constraint</th></tr>
+  <tr><td>1</td><td>Rajesh (UI)</td><td>Types the question in FreightLens UI</td><td>&mdash;</td></tr>
+  <tr><td>2</td><td>Agent</td><td>Resolves user identity from JWT &rarr; tenant_id = 'tata_motors'</td><td>Auth service. Fails immediately if JWT invalid.</td></tr>
+  <tr><td>3</td><td>NL&rarr;SQL (LLM)</td><td>Generates: SELECT * FROM delayed_shipments WHERE week = current_week()</td><td>Gold schema injected as system prompt context</td></tr>
+  <tr><td>4</td><td>SQL Validator</td><td>Checks: SELECT only &check; &middot; Gold tables only &check; &middot; valid columns &check;</td><td>Rejects on any failure. Query never reaches ClickHouse.</td></tr>
+  <tr><td>5</td><td>Tenant Middleware</td><td>Injects AND tenant_id = 'tata_motors' into the query</td><td>Tata Motors cannot see other tenants' data</td></tr>
+  <tr><td>6</td><td>ClickHouse Gold</td><td>delayed_shipments view filters: is_stale = false AND tenant_id = 'tata_motors'. Returns SH-001 (ETD delayed 4 days; tracking last updated 2 hours ago &check;)</td><td>Freshness constraint is in the view definition &mdash; agents cannot bypass it</td></tr>
+  <tr><td>7</td><td>Agent &rarr; ClickHouse</td><td>Queries rate_comparison for SH-001's lane (Chennai&rarr;Hamburg). Tenant filter auto-injected again.</td><td>Only rates with confidence &ge;0.85 and is_rate_outlier = false are included</td></tr>
+  <tr><td>8</td><td>ClickHouse returns</td><td>contract_rate = Rs2.8L, market_rate = Rs2.2L (Freightos, 4hrs old &check;), spot_offer = Rs2.1L (AI email, confidence 0.92 &check;)</td><td>&mdash;</td></tr>
+  <tr><td>9</td><td>Agent (business logic)</td><td>Saving = (Rs2.8L &minus; Rs2.1L) &times; 10 containers = Rs7L. Spot offer valid until Aug 31 &check;</td><td>Business logic in agent layer, not SQL</td></tr>
+  <tr><td>10</td><td>Agent &rarr; Rajesh</td><td>"SH-001 is delayed 4 days (tracking data as of 2 hours ago). Spot offer Rs2.1L vs. your contract Rs2.8L &mdash; potential saving of Rs7L. Offer valid until Aug 31. Shall I initiate a rebid?"</td><td>Freshness annotation is mandatory in every response involving tracking data</td></tr>
+  <tr><td>11</td><td>Rajesh approves &rarr; system</td><td>Agent creates a rebid ticket via a separate write API &mdash; not through ClickHouse (agents have SELECT-only access to the warehouse)</td><td>Write actions route through the OLTP system, not the data warehouse</td></tr>
+</table>
+
+<h4>How tracking data freshness is surfaced</h4>
+<p>Every agent response that involves tracking data includes an explicit annotation ("tracking data as of X hours ago"). This is enforced at the Response Formatter layer &mdash; not optional. If tracking data is stale (is_stale = true), the <code>delayed_shipments</code> view excludes that shipment. The agent instead returns: "I found a shipment with a delayed status but the tracking data is [N] hours old. Please verify with the carrier directly before acting."</p>
+
+<hr/>
+
+<!-- SECTION 4 -->
+<h2>4. Failure Analysis</h2>
+
+<div class="failure-box">
+  <span class="failure-label">FAILURE MODE 1</span>
+  <h4>Tracking Event Silence &mdash; The "Ghost Delay"</h4>
+  <p><strong>Scenario:</strong> The carrier's tracking API stops sending events for 18 hours (API outage or rate limit). SH-001's last recorded event says "ETD delayed to Sep 2." The ship actually departed on Sep 2 &mdash; but the "departed" event was never received. The database still shows "delayed."</p>
+  <p><strong>Root cause of silence:</strong> The failure is an <em>absence of events</em>, not a system error. Debezium is running. ClickHouse is healthy. Silver processing completes without errors. Standard monitoring watches for pipeline failures &mdash; but there are none here. A tracking event that was never sent produces no error, no dead-letter queue entry, nothing. The only signal is the staleness of existing data, which standard alerting does not measure.</p>
+  <p><strong>Impact radius:</strong></p>
+  <ul>
+    <li><code>delayed_shipments</code> Gold view: SH-001 incorrectly appears as delayed</li>
+    <li>Agent recommendation: Initiates unnecessary rebid discussions with a carrier for a shipment already at sea</li>
+    <li>Operations escalation and client trust damage (this exact scenario occurred per the brief)</li>
+  </ul>
+  <p><strong>Mitigation in this design:</strong></p>
+  <ul>
+    <li><strong>is_stale flag (primary guard):</strong> clean_tracking_events marks any record stale if (now() &minus; ingested_at) &gt; 6 hours. The delayed_shipments Gold view structurally excludes is_stale = true records. The ghost delay cannot reach an agent recommendation.</li>
+    <li><strong>Explicit stale messaging:</strong> When SH-001 is excluded due to staleness, the agent responds: "I found a shipment with a delayed status but the tracking data is [N] hours old. Please verify directly with the carrier before acting."</li>
+    <li><strong>Proactive monitoring alert:</strong> If any active tenant produces zero new tracking events for &gt;8 consecutive hours &rarr; page on-call. Detects carrier API silence before any agent query is affected.</li>
+  </ul>
+</div>
+
+<div class="failure-box">
+  <span class="failure-label">FAILURE MODE 2</span>
+  <h4>AI Extraction Error Silently Poisoning Rate Analytics</h4>
+  <p><strong>Scenario:</strong> The email extraction agent misreads "Rs2.1L" as "Rs21L" &mdash; a 10x error from a decimal parsing failure. Confidence score is 0.88 (above the 0.85 threshold) because the email was cleanly formatted and all other fields were correctly extracted. The is_rate_outlier check should catch this &mdash; but on a new lane with sparse core_system records, the lane median may be unreliable. The bad record promotes to Gold.</p>
+  <p><strong>Root cause of silence:</strong> The record has a valid numeric rate, a valid lane, a valid expiry date, and a confidence score above threshold. It passes all schema validations &mdash; no null, no wrong type, no constraint violation. Standard data quality monitoring catches missing or malformed data; it does not catch plausible-but-wrong values. The record is indistinguishable from a legitimate booking.</p>
+  <p><strong>Impact radius:</strong></p>
+  <ul>
+    <li><code>rate_comparison</code>: inflated spot rates make the contract rate appear comparatively cheap</li>
+    <li><code>rebid_candidates</code>: real rebid opportunities missed because the comparison baseline is artificially elevated</li>
+    <li><code>lane_benchmarks</code>: cross-client aggregates on the affected lane skewed upward</li>
+    <li>Data Science model outputs: "you're paying below market" when the client is actually overpaying</li>
+  </ul>
+  <p><strong>Mitigation in this design:</strong></p>
+  <ul>
+    <li><strong>Rate outlier check (Silver):</strong> If AI-extracted rate &gt; 3&times; the rolling median for that lane (core_system records only), is_rate_outlier = true. Does NOT promote to Gold. Enters the human review queue regardless of confidence score.</li>
+    <li><strong>Dual-threshold requirement (Gold):</strong> AI-extracted rates must satisfy both: confidence &ge;0.85 AND is_rate_outlier = false. Reduces single-signal failure mode.</li>
+    <li><strong>Weekly reconciliation job:</strong> Compares AI-extracted rates against confirmed core_system records for the same booking. Tracks per-forwarder, per-email-domain extraction accuracy to identify systematic failures early.</li>
+    <li><strong>New lane handling:</strong> For lanes with fewer than 10 core_system records (sparse median), all AI-extracted rates route to human review regardless of confidence. The outlier check is only reliable with sufficient reference data.</li>
+  </ul>
+</div>
+
+<hr/>
+
+<!-- SECTION 5 -->
+<h2>5. Tradeoffs</h2>
+
+<h3>5.1 Three Deliberate Omissions</h3>
+<table>
+  <tr><th>What I left out</th><th>Chosen instead</th><th>Functional cost</th><th>Trigger to revisit</th></tr>
+  <tr><td><strong>Real-time streaming (Kafka + Flink)</strong></td><td>CDC via Debezium (~seconds for core system); hourly batch for external APIs</td><td>External market rate data can be up to 1 hour stale. Cannot support sub-30-second latency for live auction rebids or real-time carrier rate feeds.</td><td>A client SLA requiring &lt;30-second tracking freshness, or a product feature triggering automated rebids within seconds of a rate change.</td></tr>
+  <tr><td><strong>Vector embeddings / semantic search</strong></td><td>SQL-only queries on structured Gold views</td><td>Agents cannot answer questions like "find shipments similar to ones that had port delays last quarter." All agent queries must be expressible as structured SQL filters.</td><td>Agent roadmap includes "find similar historical incidents" or "explain why this shipment is anomalous" &mdash; use cases requiring semantic similarity.</td></tr>
+  <tr><td><strong>Full GDPR right-to-erasure in Bronze</strong></td><td>Deletion honored at Silver and Gold only; Bronze is append-only</td><td>Bronze retains PII in raw JSON payloads even after a client's deletion request is honored at Silver/Gold. Creates compliance exposure for EU clients under active GDPR enforcement.</td><td>First enterprise EU client subject to GDPR enforcement, or legal requirement for full deletion including raw logs (would require crypto-shredding approach on Bronze).</td></tr>
+</table>
+
+<h3>5.2 First Bottleneck at 3&times; Current Volume</h3>
+<p>At 3&times; volume (~1,200 clients, ~30M tracking events/day), the first bottleneck will be <strong>Gold layer views computed on-demand at query time</strong>. Views like <code>delayed_shipments</code> and <code>rate_comparison</code> currently JOIN Silver tables live on every agent query. At 3&times; agent query volume with concurrent sessions across 1,200 clients, these joins will degrade significantly.</p>
+<p><strong>Required architectural shift:</strong> Materialize the Gold views into pre-computed tables, refreshed every 15 minutes by a background job. This moves latency from query-time (unbounded) to refresh-time (controlled). Agents query pre-computed results with guaranteed freshness annotations. The 15-minute staleness window is acceptable for freight &mdash; clients are not making sub-minute decisions on cargo that is mid-ocean.</p>
+<p>The second bottleneck is the single shared ClickHouse cluster serving both agent queries and Silver processing. Adding read replicas offloads agent query traffic with no architectural redesign required.</p>
+
+<h3>5.3 Critical Self-Assessment &mdash; Most Controversial Design Choice</h3>
+<p>My most contentious decision is <strong>allowing AI-extracted data into the Gold serving layer</strong> (subject to confidence and outlier thresholds) rather than quarantining all AI-extracted data until human verification.</p>
+<p><strong>The case against this choice:</strong> At 5-8% error rate, even a 0.88 confidence record has a non-trivial probability of being wrong. A strict position would quarantine all AI-extracted data until a human approves it &mdash; zero automated promotion.</p>
+<p><strong>Why I made this choice:</strong> Freight spot rates from forwarders are time-sensitive and come almost exclusively via email. A 48-hour spot offer reviewed by a human queue with a 24-hour SLA is worthless by the time it reaches the agent. Quarantining all AI data removes the email extraction feature from production value. At 92-95% extraction accuracy, the dual-threshold guard (confidence + outlier check) catches the most dangerous errors without blocking the majority of correct records.</p>
+<p><strong>What would cause me to change this decision:</strong> If the error rate climbs above 10%; if a single AI-extracted rate causes a client to execute a rebid at the wrong price (a material financial loss, not just a bad recommendation); or if the weekly reconciliation job reveals systematic extraction failures on specific forwarder email domains. At that point I would shift to full quarantine with an expedited 2-hour human review SLA and work with the product team on replacing free-text email with a structured rate submission API.</p>
+
+</body>
+</html>
