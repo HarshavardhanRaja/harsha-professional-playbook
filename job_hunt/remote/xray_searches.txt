@@ -1,0 +1,92 @@
+======================================================
+  REMOTE DATA ENGINEERING - X-RAY SEARCH QUERIES
+  Sorted by Tier (Best ROI First)
+======================================================
+
+ALWAYS APPEND THIS TO ANY SEARCH:
+-"US only" -"United States only" -"W-2" -"must be based in US" -"Americas only"
+
+------------------------------------------------------
+TIER 1 — HIGHEST SIGNAL (Use these daily)
+Company ATS boards: freshest postings, less competition
+------------------------------------------------------
+
+site:greenhouse.io "data engineer" "remote" "worldwide"
+site:greenhouse.io "data engineer" "remote" -"US only" -"United States"
+site:greenhouse.io "data engineer" "dbt" "remote"
+site:greenhouse.io "data engineer" "spark" "airflow" "remote"
+site:greenhouse.io "analytics engineer" "remote" "worldwide"
+site:greenhouse.io "data engineer" "async" "remote"
+
+site:jobs.lever.co "data engineer" "remote" "worldwide"
+site:jobs.lever.co "data engineer" "remote" "async"
+site:jobs.lever.co "data engineer" "remote" -"US only"
+site:jobs.lever.co "analytics engineer" "remote"
+site:jobs.lever.co "data engineer" "dbt" OR "spark" "remote"
+
+site:jobs.ashbyhq.com "data engineer" "remote"
+site:jobs.ashbyhq.com "data engineer" "remote" "worldwide"
+site:jobs.ashbyhq.com "analytics engineer" "remote"
+
+site:apply.workable.com "data engineer" "remote" "worldwide"
+site:apply.workable.com "data engineer" "remote" -"US only"
+
+
+------------------------------------------------------
+TIER 2 — HIGH VOLUME (Use 3x per week)
+LinkedIn & aggregators: most leads, needs filtering
+------------------------------------------------------
+
+site:linkedin.com/jobs "data engineer" "remote" "worldwide"
+site:linkedin.com/jobs "data engineer" "remote" -"US only" -"United States only"
+site:linkedin.com/jobs "senior data engineer" "remote" "async"
+site:linkedin.com/jobs "data engineer" "dbt" "remote" "worldwide"
+site:linkedin.com/jobs "data engineer" "spark" "remote" -"W-2"
+site:linkedin.com/jobs "data engineer" "airflow" "remote" "APAC"
+site:linkedin.com/jobs "analytics engineer" "remote" "worldwide"
+site:linkedin.com/jobs "data platform engineer" "remote" "worldwide"
+
+site:weworkremotely.com "data engineer"
+site:weworkremotely.com "analytics engineer"
+
+site:remote.co "data engineer" "worldwide"
+site:remote.co "data engineer" -"US only"
+
+
+------------------------------------------------------
+TIER 3 — BROAD NET (Use weekly as a sweep)
+General Google searches: catches anything missed above
+------------------------------------------------------
+
+"data engineer" "remote" "worldwide" "async-first" -"US only" -"W-2"
+"senior data engineer" "remote" "APAC" OR "worldwide" OR "timezone flexible"
+"data engineer" "remote" "India" OR "APAC" "full-time"
+"analytics engineer" "dbt" "remote" "worldwide" -"US only"
+"data platform engineer" "spark" "remote" "worldwide"
+"data engineer" "remote" "open to all timezones" -"US only"
+"data engineer" "remote" "contract" "worldwide" "dbt" OR "spark" OR "airflow"
+
+
+------------------------------------------------------
+MODIFIER CHEAT SHEET
+------------------------------------------------------
+
+"exact phrase"          →  must contain this
+-"term"                 →  must NOT contain this
+OR                      →  either term works
+site:domain.com         →  search only this site
+"dbt" OR "spark"        →  flexible stack matching
+
+STACK TERMS TO ROTATE IN:
+dbt | spark | airflow | kafka | flink | snowflake | bigquery | redshift | databricks | prefect | dagster
+
+ROLE VARIANTS TO ROTATE IN:
+data engineer | senior data engineer | analytics engineer | data platform engineer | data infrastructure engineer
+
+TIMEZONE/LOCATION TERMS THAT MEAN YES:
+worldwide | global | async-first | async | APAC welcome | open to all timezones | timezone flexible
+
+TERMS THAT MEAN NO (always exclude):
+US only | United States only | W-2 | must be based in US | Americas only | EST required | PST required
+
+======================================================

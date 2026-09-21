@@ -1,0 +1,51 @@
+*Big Data & Spark*
+
+•⁠  ⁠Spark architecture and execution flow
+•⁠  ⁠Spark Streaming fundamentals
+•⁠  ⁠Windowing and stateful processing
+•⁠  ⁠Watermarking and late-arriving data
+•⁠  ⁠Checkpointing and fault tolerance
+•⁠  ⁠Exactly-once vs at-least-once processing
+•⁠  ⁠Spark performance optimization
+•⁠  ⁠Partitioning, shuffles, broadcast joins and data skew
+•⁠  ⁠Memory management and executor optimization
+
+*Kafka*
+
+•⁠  ⁠Kafka architecture and partitions
+•⁠  ⁠Consumer groups and offset management
+•⁠  ⁠Message ordering
+•⁠  ⁠Replay and reprocessing
+•⁠  ⁠Idempotent processing
+•⁠  ⁠Schema evolution
+•⁠  ⁠Reliability and failure handling
+
+*Scala & OOP*
+
+•⁠  ⁠Core OOP principles
+•⁠  ⁠Advanced Scala concepts
+•⁠  ⁠SOLID principles and design patterns
+•⁠  ⁠JVM fundamentals and garbage collection
+
+*Data Engineering & Analytics*
+
+•⁠  ⁠ETL pipeline design
+•⁠  ⁠Data modelling
+•⁠  ⁠Data quality and validation
+•⁠  ⁠Batch vs streaming processing
+•⁠  ⁠Large-scale data processing
+
+*APIs & Distributed Systems*
+
+•⁠  ⁠REST API fundamentals
+•⁠  ⁠API resilience: retries, timeouts, circuit breakers and rate limiting
+•⁠  ⁠API versioning and authentication
+•⁠  ⁠Distributed system design and reliability
+
+*Production & Performance*
+
+•⁠  ⁠Monitoring and troubleshooting
+•⁠  ⁠Performance bottleneck identification
+•⁠  ⁠Production failure handling
+•⁠  ⁠Backfilling and data recovery
+•⁠  ⁠Scalability and cost optimization

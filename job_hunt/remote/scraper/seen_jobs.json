@@ -1,0 +1,36 @@
+{
+  "urls": [
+    "https://remotive.com/remote-jobs/software-development/senior-data-engineer-2091097",
+    "https://himalayas.app/companies/armis/jobs/senior-staff-data-infrastructure-engineer",
+    "https://cribl.io/job-detail/?gh_jid=6120094004",
+    "https://cribl.io/job-detail/?gh_jid=6135124004",
+    "https://boards.greenhouse.io/cloudflare/jobs/8055118?gh_jid=8055118",
+    "https://databricks.com/company/careers/open-positions/job?gh_jid=8638849002",
+    "https://databricks.com/company/careers/open-positions/job?gh_jid=8761732002",
+    "https://databricks.com/company/careers/open-positions/job?gh_jid=8692962002",
+    "https://databricks.com/company/careers/open-positions/job?gh_jid=6322654002",
+    "https://job-boards.greenhouse.io/twilio/jobs/8008538",
+    "https://stripe.com/jobs/search?gh_jid=8113687",
+    "https://stripe.com/jobs/search?gh_jid=8070572",
+    "https://www.brex.com/careers/8523806002?gh_jid=8523806002",
+    "https://job-boards.greenhouse.io/gusto/jobs/8099751",
+    "https://job-boards.greenhouse.io/mercury/jobs/6141014004"
+  ],
+  "pairs": [
+    "lemon.io||senior data engineer",
+    "armis||senior staff data infrastructure engineer",
+    "cribl||staff analytics engineer",
+    "cribl||staff data engineer",
+    "cloudflare||senior data engineer",
+    "databricks||senior go-to-market (gtm) analytics engineer (ai & pipelines)",
+    "databricks||specialist solutions architect - data engineering & warehousing (digital native business)",
+    "databricks||specialist solutions architect - data engineering & warehousing (financial services)",
+    "databricks||sr. product manager, data engineering",
+    "twilio||staff, analytics engineer, gtm data science & analytics",
+    "stripe||account executive, product sales (data pipeline)",
+    "stripe||data analyst, financial data engineering",
+    "brex||data engineer",
+    "gusto||senior data engineer",
+    "mercury||head of data engineering & platform"
+  ]
+}

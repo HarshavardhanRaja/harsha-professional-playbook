@@ -1,0 +1,46 @@
+# Remote-friendly company slugs for Greenhouse / Lever / Ashby APIs
+# Format: slug|platform   (platform = greenhouse | lever | ashby)
+# All slugs below have been verified as live (HTTP 200).
+# Add more — no code changes needed. Lines starting with # are ignored.
+
+# ── Data / Analytics / ML ──────────────────────────────────────────
+fivetran|greenhouse
+singlestore|greenhouse
+starburst|greenhouse
+imply|greenhouse
+cribl|greenhouse
+amplitude|greenhouse
+mixpanel|greenhouse
+
+# ── Cloud / Infra / DevTools ───────────────────────────────────────
+cloudflare|greenhouse
+databricks|greenhouse
+cockroachlabs|greenhouse
+twilio|greenhouse
+
+# ── Product / SaaS ─────────────────────────────────────────────────
+stripe|greenhouse
+brex|greenhouse
+figma|greenhouse
+gusto|greenhouse
+mercury|greenhouse
+remote|greenhouse
+
+# ── Ashby (modern startup ATS) ─────────────────────────────────────
+# Data quality & observability
+anomalo|ashby
+lightdash|ashby
+
+# Data transformation / semantic layer
+cube|ashby
+prefect|ashby
+
+# Data tools / viz
+hex|ashby
+
+# ── HOW TO FIND MORE SLUGS ─────────────────────────────────────────
+# Greenhouse: Go to company careers page → look for greenhouse.io in URL
+#   e.g. https://boards.greenhouse.io/SLUG/jobs  →  slug is SLUG
+# Lever: https://jobs.lever.co/SLUG  →  slug is SLUG
+# Ashby: https://jobs.ashbyhq.com/SLUG  →  slug is SLUG
+# Then add the line: slug|platform
